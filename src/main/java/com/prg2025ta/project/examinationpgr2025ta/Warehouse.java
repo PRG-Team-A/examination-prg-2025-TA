@@ -1,5 +1,6 @@
 package com.prg2025ta.project.examinationpgr2025ta;
 
+import com.prg2025ta.project.examinationpgr2025ta.exceptions.OutOfStockException;
 import com.prg2025ta.project.examinationpgr2025ta.products.GroceryProduct;
 import com.prg2025ta.project.examinationpgr2025ta.products.Product;
 
@@ -8,6 +9,10 @@ import java.util.*;
 
 public class Warehouse {
     private Map<Product, Integer> productsInStock = new HashMap<>();
+
+    public Map<Product, Integer> getProductsInStock() {
+        return productsInStock;
+    }
 
     public Warehouse() {}
     public Warehouse(Product... products) { acceptDelivery(products); }
@@ -21,6 +26,8 @@ public class Warehouse {
         for (Product product : products) {
             if (productsInStock.containsKey(product)) {
                 this.productsInStock.put(product, this.productsInStock.get(product) + 1);
+            } else {
+                this.productsInStock.put(product, 1);
             }
         }
     }
@@ -34,14 +41,23 @@ public class Warehouse {
         return amount;
     }
 
+    /**
+     * Removes all products in the warehouse which are expired by today
+     */
     public void purgeExpiredProducts() {
+        purgeExpiredProducts(LocalDate.now());
+    }
+
+    /**
+     * Removes all products in the warehouse which are expired by {@code date}
+     */
+    public void purgeExpiredProducts(LocalDate date) {
         List<Product> expiredProducts = new ArrayList<>();
-        LocalDate today = LocalDate.now();
 
         for (Product product : this.productsInStock.keySet()) {
             if (!(product instanceof GroceryProduct groceryProduct)) { continue; }
 
-            if (groceryProduct.getDateOfExpiry().isBefore(today)) {
+            if (groceryProduct.getDateOfExpiry().isBefore(date)) {
                 expiredProducts.add(groceryProduct);
             }
         }
@@ -50,7 +66,27 @@ public class Warehouse {
         }
     }
 
-    public void removeFromWarehouse(Product product) {
+    /**
+     * @param product The product of which to remove one item from the warehouse
+     * @throws OutOfStockException The product is not in stock
+     */
+    public void removeFromWarehouse(Product product) throws OutOfStockException {
+        removeFromWarehouse(product, 1);
+    }
 
+    /**
+     * @param product The product to remove
+     * @param n How many units of this product should be removed
+     * @throws OutOfStockException Not enough (or none) of this product is in the warehouse
+     */
+    public void removeFromWarehouse(Product product, int n) throws OutOfStockException {
+        if (!this.productsInStock.containsKey(product)) throw new OutOfStockException();
+
+        Integer stockAvailable = productsInStock.get(product);
+        if (stockAvailable <= n) {
+            this.productsInStock.remove(product);
+        } else {
+            this.productsInStock.put(product, stockAvailable - n);
+        }
     }
 }

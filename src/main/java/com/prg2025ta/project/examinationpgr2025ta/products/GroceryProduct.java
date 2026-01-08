@@ -1,9 +1,14 @@
 package com.prg2025ta.project.examinationpgr2025ta.products;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.UUID;
 
 public class GroceryProduct implements Product {
+    public static final double defaultPrice = Double.NaN;
+    public static final LocalDate defaultDateOfExpiry = LocalDate.MAX;
+    public static final boolean defaultNeedsCooling = false;
+
     private UUID uuid;
     private double price;
     private String displayName;
@@ -20,11 +25,14 @@ public class GroceryProduct implements Product {
     public void setPrice(double newPrice) { this.price = newPrice; }
     public void setDisplayName(String newDisplayName) { this.displayName = newDisplayName; }
 
+    public GroceryProduct(String displayName) {
+        this(displayName, GroceryProduct.defaultPrice);
+    }
     public GroceryProduct(String displayName, double price) {
-        this(displayName, price, null);
+        this(displayName, price, GroceryProduct.defaultDateOfExpiry);
     }
     public GroceryProduct(String displayName, double price, LocalDate dateOfExpiry) {
-        this(displayName, price, dateOfExpiry, false);
+        this(displayName, price, dateOfExpiry, GroceryProduct.defaultNeedsCooling);
     }
     public GroceryProduct(String displayName, double price, LocalDate dateOfExpiry, boolean needsCooling) {
         this.uuid = UUID.randomUUID();
