@@ -3,24 +3,25 @@
 # examination-prg-2025-TA
 Repository for the programming project. Built with JAVA mainly.
 
-Branch Naming
-Types:
-Feat: Add new feature
-Bug: Report Bug
-Fix: Fix Bug
-Init: Set primary rules when add branch
-Refactor: Refactoring
-Style: Fix design
-HOTFIX: Fix severe Bug
-Rename: change name
-Remove: delete
-Comment: leave comment
-Chore: Fix the build (bundle)
-Test: write test code
+## Branch Naming <br>
+{Types} <br>
+Feat: Add new feature <br>
+Bug: Report Bug <br>
+Fix: Fix Bug <br>
+Init: Set primary rules when add branch <br>
+Refactor: Refactoring <br>
+Style: Fix design <br>
+HOTFIX: Fix severe Bug <br>
+Rename: change name <br>
+Remove: delete <br>
+Comment: leave comment <br>
+Chore: Fix the build (bundle) <br>
+Test: write test code <br>
 
-Example: {Type}/{feature or representative component}
-1. Feat/RefreshToken
-2. Feat/HomePage
-3. Feat/zustandSetting​
+### Example: {Type}/{feature or representative component} <br>
+1. Feat/RefreshToken <br>
+2. Feat/HomePage <br>
+3. Feat/zustandSetting <br>​
 
+---
 Edited by JW on 9th.Jan.2026
