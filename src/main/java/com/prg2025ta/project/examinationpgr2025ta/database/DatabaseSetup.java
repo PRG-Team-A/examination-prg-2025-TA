@@ -1,6 +1,7 @@
 package com.prg2025ta.project.examinationpgr2025ta.database;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -14,10 +15,10 @@ public class DatabaseSetup {
     }
 
     public static void setup(Connection connection) throws SQLException {
-        Statement statement = connection.createStatement();
 
         for (String sql : sql_to_execute) {
-            statement.execute(sql);
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.execute();
         }
 
     }
