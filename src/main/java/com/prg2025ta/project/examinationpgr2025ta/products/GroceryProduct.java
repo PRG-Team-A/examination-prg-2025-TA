@@ -35,7 +35,10 @@ public class GroceryProduct implements Product {
         this(displayName, price, dateOfExpiry, GroceryProduct.defaultNeedsCooling);
     }
     public GroceryProduct(String displayName, double price, LocalDate dateOfExpiry, boolean needsCooling) {
-        this.uuid = UUID.randomUUID();
+        this(displayName, price, dateOfExpiry, needsCooling, UUID.randomUUID());
+    }
+    public GroceryProduct(String displayName, double price, LocalDate dateOfExpiry, boolean needsCooling, UUID uuid) {
+        this.uuid = uuid;
         this.price = price;
         this.displayName = displayName;
         this.dateOfExpiry = dateOfExpiry;
