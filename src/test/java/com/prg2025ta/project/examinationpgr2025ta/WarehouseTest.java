@@ -127,5 +127,10 @@ class WarehouseTest {
         public String getDisplayName() {
             return "NonGroceryProduct";
         }
+
+        @Override
+        public boolean equals(Product other) {
+            return other.getUuid().equals(this.getUuid());
+        }
     }
 }

@@ -4,7 +4,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class SQLiteConnection {
+public class SQLiteConnection implements AutoCloseable {
+    public static String dbURL = "jdbc:sqlite:database.db";
     private static SQLiteConnection INSTANCE = null;
     private Connection connection = null;
 
@@ -25,11 +26,15 @@ public class SQLiteConnection {
     }
 
     public void connect() throws SQLException {
-        String url = "jdbc:sqlite:database.db";
-        connection = DriverManager.getConnection(url);
+        connection = DriverManager.getConnection(SQLiteConnection.dbURL);
     }
 
     static void main() throws SQLException {
         DatabaseSetup.setup();
+    }
+
+    @Override
+    public void close() throws Exception {
+        this.connection.close();
     }
 }

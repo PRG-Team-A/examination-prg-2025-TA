@@ -6,4 +6,6 @@ public interface Product {
     UUID getUuid();
     double getPrice();
     String getDisplayName();
+
+    boolean equals(Product other);
 }

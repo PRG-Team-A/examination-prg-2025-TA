@@ -1,5 +1,7 @@
 package com.prg2025ta.project.examinationpgr2025ta.products;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
@@ -18,6 +20,11 @@ public class GroceryProduct implements Product {
     @Override public UUID getUuid() { return uuid; }
     @Override public double getPrice() { return price; }
     @Override public String getDisplayName() { return displayName; }
+
+    @Override
+    public boolean equals(Product other) {
+        return other.getUuid().equals(this.getUuid());
+    }
 
     public LocalDate getDateOfExpiry() { return dateOfExpiry; }
     public boolean needsToBeCooled() { return needsCooling; }
