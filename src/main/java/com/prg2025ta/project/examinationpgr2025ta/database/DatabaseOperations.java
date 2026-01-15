@@ -71,4 +71,21 @@ public class DatabaseOperations {
                 UUID.fromString(product_id)
         );
     }
+
+    public void deleteProducts(List<UUID> uuids) throws SQLException {
+        PreparedStatement statement = dbConnection
+                .prepareStatement("DELETE FROM products WHERE product_uuid = ?");
+
+        dbConnection.setAutoCommit(false);
+
+        for (UUID uuid : uuids) {
+            statement.setString(1, uuid.toString());
+            statement.addBatch();
+        }
+
+        int[] result = statement.executeBatch();
+        dbConnection.commit();
+
+        System.out.println("Deleted " + result.length + " products.");
+    }
 }
