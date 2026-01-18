@@ -24,8 +24,6 @@ class WarehouseTest {
             LocalDate.MIN
     );
 
-    NonGroceryProduct nonGroceryProduct = new NonGroceryProduct();
-
     @BeforeEach
     void setup() {
         warehouse = new Warehouse();
@@ -75,26 +73,27 @@ class WarehouseTest {
 
     @Test
     void testPurgeExpiredProducts() {
-        warehouse.acceptDelivery(testProduct, testProduct, expiredProduct, nonGroceryProduct);
+        warehouse.acceptDelivery(testProduct, testProduct);
+        warehouse.acceptDelivery(expiredProduct);
+
         warehouse.purgeExpiredProducts(LocalDate.ofYearDay(2026, 8));
 
         assertEquals(2, warehouse.getAmountOfProductInStock(testProduct));
         assertEquals(0, warehouse.getAmountOfProductInStock(expiredProduct));
-        assertEquals(1, warehouse.getAmountOfProductInStock(nonGroceryProduct));
     }
 
     @Test
     void removeFromWarehouse() {
-        warehouse.acceptDelivery(testProduct, testProduct, expiredProduct, nonGroceryProduct, nonGroceryProduct);
-        warehouse.removeFromWarehouse(testProduct, 2);
+        warehouse.acceptDelivery(testProduct, testProduct, expiredProduct);
+
+        warehouse.removeFromWarehouse(testProduct, 2);;
+
         assertEquals(0, warehouse.getAmountOfProductInStock(testProduct));
         assertEquals(1, warehouse.getAmountOfProductInStock(expiredProduct));
 
         warehouse.removeFromWarehouse(expiredProduct);
         assertEquals(0, warehouse.getAmountOfProductInStock(expiredProduct));
 
-        warehouse.removeFromWarehouse(nonGroceryProduct, 1);
-        assertEquals(1, warehouse.getAmountOfProductInStock(nonGroceryProduct));
 
         Exception exception = assertThrows(OutOfStockException.class, () -> {
             warehouse.removeFromWarehouse(expiredProduct);
@@ -108,29 +107,5 @@ class WarehouseTest {
         Warehouse warehouse1 = new Warehouse(testProduct, testProduct, expiredProduct);
         assertEquals(2, warehouse1.getAmountOfProductInStock(testProduct));
         assertEquals(1, warehouse1.getAmountOfProductInStock(expiredProduct));
-        assertEquals(0, warehouse1.getAmountOfProductInStock(nonGroceryProduct));
-    }
-
-    static class NonGroceryProduct implements Product {
-
-        @Override
-        public UUID getUuid() {
-            return UUID.randomUUID();
-        }
-
-        @Override
-        public double getPrice() {
-            return 0;
-        }
-
-        @Override
-        public String getDisplayName() {
-            return "NonGroceryProduct";
-        }
-
-        @Override
-        public boolean equals(Product other) {
-            return other.getUuid().equals(this.getUuid());
-        }
     }
 }

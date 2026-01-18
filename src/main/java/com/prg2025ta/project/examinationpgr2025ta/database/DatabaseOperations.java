@@ -5,6 +5,9 @@ import com.prg2025ta.project.examinationpgr2025ta.products.Product;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -49,9 +52,9 @@ public class DatabaseOperations {
     }
 
     // TODO: Add tests
-    public GroceryProduct getProductByUUID(UUID uuid) throws SQLException {
+    public Product getProductByUUID(UUID uuid) throws SQLException {
         PreparedStatement statement = dbConnection
-                .prepareStatement("SELECT product_uuid, display_name, price FROM products WHERE product_uuid = ?");
+                .prepareStatement("SELECT product_uuid, display_name, price, needs_cooling, expiry_date FROM products WHERE product_uuid = ?");
 
         statement.setString(1, uuid.toString());
         ResultSet resultSet = statement.executeQuery();
@@ -62,19 +65,25 @@ public class DatabaseOperations {
             return null;
         }
 
-        String product_id = resultSet.getString(1);
-        String display_name = resultSet.getString(2);
-        double price = resultSet.getDouble(3);
+        String product_id = resultSet.getString("product_uuid");
+        String display_name = resultSet.getString("display_name");
+        double price = resultSet.getDouble("price");
+        int needsCooling = resultSet.getInt("needs_cooling");
+        long expiry_date = resultSet.getInt("expiry_date");
 
         if (product_id == null) return null;
 
-        return new GroceryProduct(
-                display_name,
-                price,
-                GroceryProduct.defaultDateOfExpiry,
-                GroceryProduct.defaultNeedsCooling,
-                UUID.fromString(product_id)
-        );
+        if (display_name != null && price != 0 && needsCooling != 0 && expiry_date != 0) {
+            return new GroceryProduct(
+                    display_name,
+                    price,
+                    LocalDate.ofInstant(Instant.ofEpochSecond(expiry_date), ZoneId.of("UTC")),
+                    needsCooling == 2,
+                    UUID.fromString(product_id)
+            );
+        }
+
+        return null;
     }
 
     public List<Product> getAllProducts() throws SQLException {

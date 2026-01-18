@@ -87,7 +87,7 @@ class DatabaseOperationsTest {
         Product testProduct = testProducts.getFirst();
 
         operations.insertNewProduct(testProduct);
-        GroceryProduct returnedProduct = operations.getProductByUUID(testProduct.getUuid());
+        Product returnedProduct = operations.getProductByUUID(testProduct.getUuid());
 
         assertEquals(testProduct.getUuid(), testProduct.getUuid());
     }
@@ -102,7 +102,7 @@ class DatabaseOperationsTest {
 
         operations.deleteProducts(Collections.singletonList(testProduct.getUuid()));
 
-        GroceryProduct groceryProduct = operations.getProductByUUID(testProduct.getUuid());
+        Product groceryProduct = operations.getProductByUUID(testProduct.getUuid());
 
         assertNull(groceryProduct);
     }
