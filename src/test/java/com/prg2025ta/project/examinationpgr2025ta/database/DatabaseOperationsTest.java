@@ -54,7 +54,8 @@ class DatabaseOperationsTest {
     }
 
     @AfterAll
-    static void afterAll() {
+    static void afterAll() throws SQLException {
+        DatabaseOperations.getInstance().close();
         if (!testDbFile.delete())
             System.out.println("Test DB could not be deleted!");
     }

@@ -132,4 +132,8 @@ public class DatabaseOperations {
 
         System.out.println("Deleted " + result.length + " products.");
     }
+
+    public void close() throws SQLException {
+        dbConnection.close();
+    }
 }
