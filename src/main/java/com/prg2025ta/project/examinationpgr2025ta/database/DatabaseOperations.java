@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -74,11 +75,13 @@ public class DatabaseOperations {
         if (product_id == null) return null;
 
         if (display_name != null && price != 0 && needsCooling != 0 && expiry_date != 0) {
+            LocalDate dateOfExpiry = LocalDate.ofInstant(Instant.ofEpochSecond(expiry_date), ZoneId.of("UTC"));
+            boolean doesProductNeedCooling = needsCooling == 2;
             return new GroceryProduct(
                     display_name,
                     price,
-                    LocalDate.ofInstant(Instant.ofEpochSecond(expiry_date), ZoneId.of("UTC")),
-                    needsCooling == 2,
+                    dateOfExpiry,
+                    doesProductNeedCooling,
                     UUID.fromString(product_id)
             );
         }
@@ -87,16 +90,16 @@ public class DatabaseOperations {
     }
 
     public List<Product> getAllProducts() throws SQLException {
+        List<Product> products = new ArrayList<>();
+
         Statement statement = dbConnection.createStatement();
         statement.execute("SELECT product_uuid, display_name, price FROM main.products;");
 
         ResultSet resultSet = statement.getResultSet();
 
         if (!resultSet.next()) {
-            return null;
+            return products;
         }
-
-        List<Product> products = new ArrayList<>();
 
         do {
             String uuid = resultSet.getString(1);
