@@ -2,7 +2,7 @@ package com.prg2025ta.project.examinationpgr2025ta;
 import java.util.Arrays;
 import java.util.List;
 
-public class Sales {
+public class SalesClass {
 
     static String customerName;
     static String paymentMethod;
