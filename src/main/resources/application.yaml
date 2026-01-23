@@ -8,3 +8,7 @@ spring:
     prefix: classpath:/templates/
     suffix: .html
     mode: HTML
+    cache: false
+  devtools:
+    restart:
+      poll-interval: 1s
