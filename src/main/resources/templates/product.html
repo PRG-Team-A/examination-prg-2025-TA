@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Creation</title>
+</head>
+<body>
+<h1>New Product</h1>
+<h2 th:text="'Server sais: ' + ${message}">Default</h2>
+<form action="#" th:action="@{/product}" th:object="${productModel}" method="post">
+</form>
+</body>
+</html>

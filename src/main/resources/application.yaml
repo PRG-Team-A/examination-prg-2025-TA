@@ -1,0 +1,10 @@
+server:
+  port: 6060
+debug: false
+spring:
+  thymeleaf:
+    check-template: true
+    check-template-location: true
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
