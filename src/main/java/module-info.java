@@ -4,6 +4,7 @@ module com.prg2025ta.project.examinationpgr2025ta {
     requires spring.boot;
     requires spring.web;
     requires spring.boot.autoconfigure;
+    requires spring.beans;
 
 
     opens com.prg2025ta.project.examinationpgr2025ta to javafx.fxml;
