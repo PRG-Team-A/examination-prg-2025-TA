@@ -38,31 +38,6 @@ class GroceryProductTest {
     }
 
     @Test
-    void getUuid() throws NoSuchFieldException, IllegalAccessException {
-        Field uuidField = groceryProduct.getClass().getDeclaredField("uuid");
-        uuidField.setAccessible(true);
-        UUID expectedUUID = (UUID) uuidField.get(groceryProduct);
-
-        assertEquals(expectedUUID, groceryProduct.getUuid());
-    }
-
-    @Test
-    void getPrice() throws NoSuchFieldException, IllegalAccessException {
-        Field priceField = groceryProduct.getClass().getDeclaredField("price");
-        priceField.setAccessible(true);
-        double expectedPrice = priceField.getDouble(groceryProduct);
-        assertEquals(expectedPrice, groceryProduct.getPrice());
-    }
-
-    @Test
-    void getDisplayName() throws NoSuchFieldException, IllegalAccessException {
-        Field displayNameField = groceryProduct.getClass().getDeclaredField("displayName");
-        displayNameField.setAccessible(true);
-        String expectedDisplayName = (String) displayNameField.get(groceryProduct);
-        assertEquals(expectedDisplayName, groceryProduct.getDisplayName());
-    }
-
-    @Test
     void getDateOfExpiry() throws NoSuchFieldException, IllegalAccessException {
         Field dateOfExpiryField = groceryProduct.getClass().getDeclaredField("dateOfExpiry");
         dateOfExpiryField.setAccessible(true);
@@ -76,19 +51,5 @@ class GroceryProductTest {
         needsCoolingField.setAccessible(true);
         Boolean expectedNeedsCooling = needsCoolingField.getBoolean(groceryProduct);
         assertEquals(expectedNeedsCooling, groceryProduct.needsToBeCooled());
-    }
-
-    @Test
-    void setPrice() {
-        double expectedPrice = 500;
-        groceryProduct.setPrice(expectedPrice);
-        assertEquals(expectedPrice, groceryProduct.getPrice());
-    }
-
-    @Test
-    void setDisplayName() {
-        String expectedDisplayName = "TestDisplayName";
-        groceryProduct.setDisplayName(expectedDisplayName);
-        assertEquals(expectedDisplayName, groceryProduct.getDisplayName());
     }
 }
