@@ -1,5 +1,5 @@
 server:
-  port: 6060
+  port: 8080
 debug: false
 spring:
   thymeleaf:
@@ -12,3 +12,5 @@ spring:
   devtools:
     restart:
       poll-interval: 1s
+    livereload:
+      enabled: true

@@ -19,6 +19,8 @@ import java.util.Map;
 public class ProductController {
     @GetMapping("/")
     public String person(Model model) {
+        // FIXME: This is only a proof-of-concept implementation and should be changed to include "real" implementation
+
         Map<Product, Integer> productsInStock = ApiApplication.warehouse.getProductsInStock();
         List<ProductModel> productModelList = new ArrayList<>();
 
@@ -27,7 +29,6 @@ public class ProductController {
         });
 
 
-        model.addAttribute("message", "Hello from the controller!");
         model.addAttribute("products", productModelList);
         return "product";
     }
