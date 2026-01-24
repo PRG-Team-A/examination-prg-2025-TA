@@ -1,12 +1,13 @@
 package com.prg2025ta.project.examinationpgr2025ta;
 import java.util.Arrays;
 import java.util.List;
+import com.prg2025ta.project.examinationpgr2025ta.products.Product;
 
 public class SalesClass {
 
     private int customerID;
     private String paymentMethod;
-    private List<String> productsBought;
+    private List<Product> productsBought;
     private double total;
 
     // Constructor
@@ -15,17 +16,6 @@ public class SalesClass {
         this.paymentMethod = paymentMethod;
         this.productsBought = productsBought;
         this.total = total;
-    }
-
-    public static void main(String[] args) {
-
-        // Testing the code
-        SalesClass sale = new SalesClass(
-                101,
-                "Credit Card",
-                Arrays.asList("Apple", "Banana", "Orange"),
-                29.99
-        );
 
         // Display sale details
         System.out.println("Customer ID: " + sale.customerID);
