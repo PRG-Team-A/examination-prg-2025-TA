@@ -11,7 +11,7 @@ public class SalesClass {
     private double total;
 
     // Constructor
-    public SalesClass(int customerID, String paymentMethod, List<String> productsBought, double total) {
+    public SalesClass(int customerID, String paymentMethod, List<Product> productsBought, double total) {
         this.customerID = customerID;
         this.paymentMethod = paymentMethod;
         this.productsBought = productsBought;
@@ -22,5 +22,4 @@ public class SalesClass {
         System.out.println("Payment Method: " + sale.paymentMethod);
         System.out.println("Products Bought: " + String.join(", ", sale.productsBought));
         System.out.println("Total Amount: $" + sale.total);
-    }
 }
