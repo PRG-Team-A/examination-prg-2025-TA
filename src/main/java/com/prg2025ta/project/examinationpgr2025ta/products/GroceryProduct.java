@@ -1,29 +1,25 @@
 package com.prg2025ta.project.examinationpgr2025ta.products;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 
-public class GroceryProduct implements Product {
-    public static final double defaultPrice = Double.NaN;
+public class GroceryProduct extends Product {
     public static final LocalDate defaultDateOfExpiry = LocalDate.MAX;
     public static final boolean defaultNeedsCooling = false;
 
-    private UUID uuid;
-    private double price;
-    private String displayName;
     private LocalDate dateOfExpiry;
     private boolean needsCooling;
 
-    @Override public UUID getUuid() { return uuid; }
-    @Override public double getPrice() { return price; }
-    @Override public String getDisplayName() { return displayName; }
+    @Override
+    public boolean equals(Product other) {
+        return other.getUuid().equals(this.getUuid());
+    }
 
     public LocalDate getDateOfExpiry() { return dateOfExpiry; }
     public boolean needsToBeCooled() { return needsCooling; }
-
-    public void setPrice(double newPrice) { this.price = newPrice; }
-    public void setDisplayName(String newDisplayName) { this.displayName = newDisplayName; }
 
     public GroceryProduct(String displayName) {
         this(displayName, GroceryProduct.defaultPrice);
@@ -35,9 +31,10 @@ public class GroceryProduct implements Product {
         this(displayName, price, dateOfExpiry, GroceryProduct.defaultNeedsCooling);
     }
     public GroceryProduct(String displayName, double price, LocalDate dateOfExpiry, boolean needsCooling) {
-        this.uuid = UUID.randomUUID();
-        this.price = price;
-        this.displayName = displayName;
+        this(displayName, price, dateOfExpiry, needsCooling, UUID.randomUUID());
+    }
+    public GroceryProduct(String displayName, double price, LocalDate dateOfExpiry, boolean needsCooling, UUID uuid) {
+        super(displayName, price, uuid);
         this.dateOfExpiry = dateOfExpiry;
         this.needsCooling = needsCooling;
     }
