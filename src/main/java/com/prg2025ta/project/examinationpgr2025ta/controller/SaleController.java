@@ -22,11 +22,7 @@ public class SaleController {
 
     @PostMapping
     public ResponseEntity<Sale> executeSale(@Valid @RequestBody SaleRequest saleRequest) {
-        try {
-            Sale sale = supermarketService.processSale(saleRequest);
-            return ResponseEntity.status(HttpStatus.CREATED).body(sale);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+        Sale sale = supermarketService.processSale(saleRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(sale);
     }
 }
