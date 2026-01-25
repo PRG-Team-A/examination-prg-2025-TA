@@ -4,69 +4,364 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Procesar Venta - Supermercado</title>
-</head>
-<body>
-    <h1>Procesar Venta</h1>
-    
-    <form id="saleForm">
-        <label>ID del Empleado:</label>
-        <input type="number" id="employeeId" required><br><br>
-        
-        <label>Método de Pago:</label>
-        <select id="paymentMethod" required>
-            <option value="CASH">Efectivo</option>
-            <option value="CARD">Tarjeta</option>
-        </select><br><br>
-        
-        <div id="productsContainer">
-            <h3>Productos:</h3>
-            <div class="product-item">
-                <label>ID Producto:</label>
-                <input type="number" class="productId" required>
-                <label>Cantidad:</label>
-                <input type="number" class="quantity" min="1" required>
-            </div>
-        </div>
-        
-        <button type="button" onclick="addProduct()">Agregar Producto</button>
-        <button type="submit">Procesar Venta</button>
-    </form>
-    
-    <div id="result"></div>
-
-    <script>
-        function addProduct() {
-            const container = document.getElementById('productsContainer');
-            const div = document.createElement('div');
-            div.className = 'product-item';
-            div.innerHTML = `
-                <label>ID Producto:</label>
-                <input type="number" class="productId" required>
-                <label>Cantidad:</label>
-                <input type="number" class="quantity" min="1" required>
-                <button type="button" onclick="this.parentElement.remove()">Eliminar</button>
-            `;
-            container.appendChild(div);
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .product-selection {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .product-selection-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .product-selection-row select,
+        .product-selection-row input {
+            flex: 1;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .selected-products {
+            margin-top: 20px;
+        }
+
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .product-item-info {
+            flex: 1;
+        }
+
+        .product-item-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .product-item-details {
+            font-size: 14px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .button-group button {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Procesar Venta - Supermercado</h1>
+        
+        <form id="saleForm">
+            <div class="form-group">
+                <label for="employeeId">ID del Empleado:</label>
+                <input type="number" id="employeeId" required min="1" placeholder="Ingrese el ID del empleado">
+            </div>
+
+            <div class="form-group">
+                <label for="paymentMethod">Método de Pago:</label>
+                <select id="paymentMethod" required>
+                    <option value="">Seleccione un método de pago</option>
+                    <option value="CASH">Efectivo</option>
+                    <option value="CARD">Tarjeta</option>
+                </select>
+            </div>
+
+            <div class="product-selection">
+                <h3 style="margin-bottom: 15px; color: #333;">Agregar Productos:</h3>
+                <div class="product-selection-row">
+                    <select id="productSelect">
+                        <option value="">Cargando productos...</option>
+                    </select>
+                    <input type="number" id="productQuantity" min="1" placeholder="Cantidad" style="width: 120px;">
+                    <button type="button" class="btn btn-secondary" onclick="addProductToSale()">Agregar</button>
+                </div>
+            </div>
+
+            <div class="selected-products" id="selectedProductsContainer" style="display: none;">
+                <h3 style="margin-bottom: 15px; color: #333;">Productos Seleccionados:</h3>
+                <div id="selectedProductsList"></div>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">Procesar Venta</button>
+            </div>
+        </form>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        let products = [];
+        let selectedProducts = [];
+
+        // Load products from API
+        async function loadProducts() {
+            try {
+                const response = await fetch('/api/products');
+                if (response.ok) {
+                    products = await response.json();
+                    const productSelect = document.getElementById('productSelect');
+                    productSelect.innerHTML = '<option value="">Seleccione un producto</option>';
+                    
+                    products.forEach(product => {
+                        const option = document.createElement('option');
+                        option.value = product.id;
+                        option.textContent = `${product.name} - $${product.price.toFixed(2)} (Stock: ${product.stock})`;
+                        productSelect.appendChild(option);
+                    });
+                } else {
+                    const error = await response.text();
+                    alert('Error al cargar productos: ' + error);
+                }
+            } catch (error) {
+                alert('Error de conexión al cargar productos: ' + error.message);
+            }
+        }
+
+        // Add product to sale
+        function addProductToSale() {
+            const productSelect = document.getElementById('productSelect');
+            const quantityInput = document.getElementById('productQuantity');
+            
+            const productId = productSelect.value;
+            const quantity = parseInt(quantityInput.value);
+
+            if (!productId) {
+                alert('Por favor seleccione un producto');
+                return;
+            }
+
+            if (!quantity || quantity < 1) {
+                alert('Por favor ingrese una cantidad válida');
+                return;
+            }
+
+            const product = products.find(p => p.id == productId);
+            if (!product) {
+                alert('Producto no encontrado');
+                return;
+            }
+
+            if (quantity > product.stock) {
+                alert(`Stock insuficiente. Disponible: ${product.stock}`);
+                return;
+            }
+
+            // Check if product already added
+            const existingIndex = selectedProducts.findIndex(p => p.productId == productId);
+            if (existingIndex !== -1) {
+                selectedProducts[existingIndex].quantity += quantity;
+            } else {
+                selectedProducts.push({
+                    productId: parseInt(productId),
+                    quantity: quantity
+                });
+            }
+
+            updateSelectedProductsDisplay();
+            productSelect.value = '';
+            quantityInput.value = '';
+        }
+
+        // Update selected products display
+        function updateSelectedProductsDisplay() {
+            const container = document.getElementById('selectedProductsContainer');
+            const list = document.getElementById('selectedProductsList');
+            
+            if (selectedProducts.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.style.display = 'block';
+            list.innerHTML = '';
+
+            selectedProducts.forEach((item, index) => {
+                const product = products.find(p => p.id == item.productId);
+                if (!product) return;
+
+                const div = document.createElement('div');
+                div.className = 'product-item';
+                div.innerHTML = `
+                    <div class="product-item-info">
+                        <div class="product-item-name">${product.name}</div>
+                        <div class="product-item-details">
+                            Cantidad: ${item.quantity} | Precio unitario: $${product.price.toFixed(2)} | 
+                            Subtotal: $${(product.price * item.quantity).toFixed(2)}
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-danger" onclick="removeProduct(${index})">Eliminar</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        // Remove product from sale
+        function removeProduct(index) {
+            selectedProducts.splice(index, 1);
+            updateSelectedProductsDisplay();
+        }
+
+        // Form submission
         document.getElementById('saleForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const employeeId = document.getElementById('employeeId').value;
             const paymentMethod = document.getElementById('paymentMethod').value;
-            
-            const productInputs = document.querySelectorAll('.product-item');
-            const products = Array.from(productInputs).map(item => ({
-                productId: parseInt(item.querySelector('.productId').value),
-                quantity: parseInt(item.querySelector('.quantity').value)
-            }));
-            
+
+            if (!employeeId) {
+                alert('Por favor ingrese el ID del empleado');
+                return;
+            }
+
+            if (!paymentMethod) {
+                alert('Por favor seleccione un método de pago');
+                return;
+            }
+
+            if (selectedProducts.length === 0) {
+                alert('Por favor agregue al menos un producto');
+                return;
+            }
+
             const saleRequest = {
                 employeeId: parseInt(employeeId),
-                products: products,
+                products: selectedProducts,
                 paymentMethod: paymentMethod
             };
-            
+
             try {
                 const response = await fetch('/api/sales', {
                     method: 'POST',
@@ -75,21 +370,32 @@
                     },
                     body: JSON.stringify(saleRequest)
                 });
-                
+
                 if (response.ok) {
                     const sale = await response.json();
                     document.getElementById('result').innerHTML = 
-                        `<p style="color: green;">Venta procesada exitosamente! ID: ${sale.id}, Total: $${sale.total}</p>`;
+                        `<div class="success">Venta procesada exitosamente!<br>ID: ${sale.id} | Total: $${sale.total.toFixed(2)}</div>`;
+                    
+                    // Reset form
+                    document.getElementById('saleForm').reset();
+                    selectedProducts = [];
+                    updateSelectedProductsDisplay();
+                    loadProducts(); // Reload products to update stock
                 } else {
                     const error = await response.text();
+                    alert('Error: ' + error);
                     document.getElementById('result').innerHTML = 
-                        `<p style="color: red;">Error: ${error}</p>`;
+                        `<div class="error">Error al procesar la venta</div>`;
                 }
             } catch (error) {
+                alert('Error de conexión: ' + error.message);
                 document.getElementById('result').innerHTML = 
-                    `<p style="color: red;">Error de conexión: ${error.message}</p>`;
+                    `<div class="error">Error de conexión</div>`;
             }
         });
+
+        // Load products on page load
+        window.addEventListener('DOMContentLoaded', loadProducts);
     </script>
 </body>
 </html>
