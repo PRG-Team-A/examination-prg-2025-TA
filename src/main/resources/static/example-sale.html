@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Procesar Venta - Supermercado</title>
+    <title>Process Sale - Supermarket</title>
     <style>
         * {
             margin: 0;
@@ -181,41 +181,41 @@
 </head>
 <body>
     <div class="container">
-        <h1>Procesar Venta - Supermercado</h1>
+        <h1>Process Sale - Supermarket</h1>
         
         <form id="saleForm">
             <div class="form-group">
-                <label for="employeeId">ID del Empleado:</label>
-                <input type="number" id="employeeId" required min="1" placeholder="Ingrese el ID del empleado">
+                <label for="employeeId">Employee ID:</label>
+                <input type="number" id="employeeId" required min="1" placeholder="Enter employee ID">
             </div>
 
             <div class="form-group">
-                <label for="paymentMethod">Método de Pago:</label>
+                <label for="paymentMethod">Payment Method:</label>
                 <select id="paymentMethod" required>
-                    <option value="">Seleccione un método de pago</option>
-                    <option value="CASH">Efectivo</option>
-                    <option value="CARD">Tarjeta</option>
+                    <option value="">Select a payment method</option>
+                    <option value="CASH">Cash</option>
+                    <option value="CARD">Card</option>
                 </select>
             </div>
 
             <div class="product-selection">
-                <h3 style="margin-bottom: 15px; color: #333;">Agregar Productos:</h3>
+                <h3 style="margin-bottom: 15px; color: #333;">Add Products:</h3>
                 <div class="product-selection-row">
                     <select id="productSelect">
-                        <option value="">Cargando productos...</option>
+                        <option value="">Loading products...</option>
                     </select>
-                    <input type="number" id="productQuantity" min="1" placeholder="Cantidad" style="width: 120px;">
-                    <button type="button" class="btn btn-secondary" onclick="addProductToSale()">Agregar</button>
+                    <input type="number" id="productQuantity" min="1" placeholder="Quantity" style="width: 120px;">
+                    <button type="button" class="btn btn-secondary" onclick="addProductToSale()">Add</button>
                 </div>
             </div>
 
             <div class="selected-products" id="selectedProductsContainer" style="display: none;">
-                <h3 style="margin-bottom: 15px; color: #333;">Productos Seleccionados:</h3>
+                <h3 style="margin-bottom: 15px; color: #333;">Selected Products:</h3>
                 <div id="selectedProductsList"></div>
             </div>
 
             <div class="button-group">
-                <button type="submit" class="btn btn-primary">Procesar Venta</button>
+                <button type="submit" class="btn btn-primary">Process Sale</button>
             </div>
         </form>
 
@@ -233,7 +233,7 @@
                 if (response.ok) {
                     products = await response.json();
                     const productSelect = document.getElementById('productSelect');
-                    productSelect.innerHTML = '<option value="">Seleccione un producto</option>';
+                    productSelect.innerHTML = '<option value="">Select a product</option>';
                     
                     products.forEach(product => {
                         const option = document.createElement('option');
@@ -243,10 +243,10 @@
                     });
                 } else {
                     const error = await response.text();
-                    alert('Error al cargar productos: ' + error);
+                    alert('Error loading products: ' + error);
                 }
             } catch (error) {
-                alert('Error de conexión al cargar productos: ' + error.message);
+                alert('Connection error loading products: ' + error.message);
             }
         }
 
@@ -259,23 +259,23 @@
             const quantity = parseInt(quantityInput.value);
 
             if (!productId) {
-                alert('Por favor seleccione un producto');
+                alert('Please select a product');
                 return;
             }
 
             if (!quantity || quantity < 1) {
-                alert('Por favor ingrese una cantidad válida');
+                alert('Please enter a valid quantity');
                 return;
             }
 
             const product = products.find(p => p.id == productId);
             if (!product) {
-                alert('Producto no encontrado');
+                alert('Product not found');
                 return;
             }
 
             if (quantity > product.stock) {
-                alert(`Stock insuficiente. Disponible: ${product.stock}`);
+                alert(`Insufficient stock. Available: ${product.stock}`);
                 return;
             }
 
@@ -318,11 +318,11 @@
                     <div class="product-item-info">
                         <div class="product-item-name">${product.name}</div>
                         <div class="product-item-details">
-                            Cantidad: ${item.quantity} | Precio unitario: $${product.price.toFixed(2)} | 
+                            Quantity: ${item.quantity} | Unit price: $${product.price.toFixed(2)} | 
                             Subtotal: $${(product.price * item.quantity).toFixed(2)}
                         </div>
                     </div>
-                    <button type="button" class="btn btn-danger" onclick="removeProduct(${index})">Eliminar</button>
+                    <button type="button" class="btn btn-danger" onclick="removeProduct(${index})">Remove</button>
                 `;
                 list.appendChild(div);
             });
@@ -342,17 +342,17 @@
             const paymentMethod = document.getElementById('paymentMethod').value;
 
             if (!employeeId) {
-                alert('Por favor ingrese el ID del empleado');
+                alert('Please enter the employee ID');
                 return;
             }
 
             if (!paymentMethod) {
-                alert('Por favor seleccione un método de pago');
+                alert('Please select a payment method');
                 return;
             }
 
             if (selectedProducts.length === 0) {
-                alert('Por favor agregue al menos un producto');
+                alert('Please add at least one product');
                 return;
             }
 
@@ -374,7 +374,7 @@
                 if (response.ok) {
                     const sale = await response.json();
                     document.getElementById('result').innerHTML = 
-                        `<div class="success">Venta procesada exitosamente!<br>ID: ${sale.id} | Total: $${sale.total.toFixed(2)}</div>`;
+                        `<div class="success">Sale processed successfully!<br>ID: ${sale.id} | Total: $${sale.total.toFixed(2)}</div>`;
                     
                     // Reset form
                     document.getElementById('saleForm').reset();
@@ -385,12 +385,12 @@
                     const error = await response.text();
                     alert('Error: ' + error);
                     document.getElementById('result').innerHTML = 
-                        `<div class="error">Error al procesar la venta</div>`;
+                        `<div class="error">Error processing sale</div>`;
                 }
             } catch (error) {
-                alert('Error de conexión: ' + error.message);
+                alert('Connection error: ' + error.message);
                 document.getElementById('result').innerHTML = 
-                    `<div class="error">Error de conexión</div>`;
+                    `<div class="error">Connection error</div>`;
             }
         });
 
