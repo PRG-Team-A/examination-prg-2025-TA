@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Creation</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>New Product</h1>
+<form action="#" th:action="@{/product}" th:object="${Product}" method="post">
+    <label for="displayNameInput">Display Name:</label>
+    <input id="displayNameInput" type="text" name="displayName" >
+
+    <label for="priceInput">Price:</label>
+    <input type="number" name="price" id="priceInput" step=".01">
+
+    <input type="submit">
+</form>
+<h2>Products in Warehouse</h2>
+<div>
+    <table>
+        <thead>
+        <tr>
+            <td>Display name</td>
+            <td>Price</td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="product: ${products}">
+            <td th:text="${product.getDisplayName()}">DISPLAY_NAME</td>
+            <td th:text="${product.getPrice()}">PRICE</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

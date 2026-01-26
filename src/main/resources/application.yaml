@@ -1,0 +1,16 @@
+server:
+  port: 8080
+debug: false
+spring:
+  thymeleaf:
+    check-template: true
+    check-template-location: true
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    cache: false
+  devtools:
+    restart:
+      poll-interval: 1s
+    livereload:
+      enabled: true

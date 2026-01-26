@@ -1,0 +1,17 @@
+body {
+    color: #ff00ba;
+    font-family: sans-serif;
+}
+
+table {
+    table-layout: fixed;
+    width: 90%;
+    margin: 10px auto;
+    border-collapse: collapse;
+    border-top: 1px solid #999999;
+    border-bottom: 1px solid #999999;
+
+    td {
+        text-align: center;
+    }
+}

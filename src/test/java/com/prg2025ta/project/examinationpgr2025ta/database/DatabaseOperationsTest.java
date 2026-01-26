@@ -78,14 +78,14 @@ class DatabaseOperationsTest {
     @Test
     void insertNewProduct() throws SQLException {
         DatabaseOperations operations = DatabaseOperations.getInstance();
-        operations.insertNewProduct(testProducts.getFirst());
+        operations.insertNewProduct(testProducts.get(0));
     }
 
     @Test
     void getProductByUUID() throws SQLException {
         DatabaseOperations operations = DatabaseOperations.getInstance();
 
-        Product testProduct = testProducts.getFirst();
+        Product testProduct = testProducts.get(0);
 
         operations.insertNewProduct(testProduct);
         Product returnedProduct = operations.getProductByUUID(testProduct.getUuid());
@@ -97,7 +97,7 @@ class DatabaseOperationsTest {
     void deleteProducts() throws SQLException {
         DatabaseOperations operations = DatabaseOperations.getInstance();
 
-        Product testProduct = testProducts.getFirst();
+        Product testProduct = testProducts.get(0);
 
         operations.insertNewProduct(testProduct);
 
