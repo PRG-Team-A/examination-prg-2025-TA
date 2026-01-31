@@ -10,13 +10,10 @@ public class GroceryProduct extends Product {
     public static final LocalDate defaultDateOfExpiry = LocalDate.MAX;
     public static final boolean defaultNeedsCooling = false;
 
+    // CHANGED: Removed equals(Product other) overload so class inherits Product.equals(Object)/hashCode() (identity by uuid).
+
     private LocalDate dateOfExpiry;
     private boolean needsCooling;
-
-    @Override
-    public boolean equals(Product other) {
-        return other.getUuid().equals(this.getUuid());
-    }
 
     public LocalDate getDateOfExpiry() { return dateOfExpiry; }
     public boolean needsToBeCooled() { return needsCooling; }
