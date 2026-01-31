@@ -18,13 +18,26 @@ public class Product {
         this.price = price;
     }
 
-    public UUID getUuid() { return this.uuid; }
-    public double getPrice() { return this.price; }
-    public String getDisplayName() { return this.displayName; }
+    public UUID getUuid() {
+        return this.uuid;
+    }
+
+    public double getPrice() {
+        return this.price;
+    }
+
+    public String getDisplayName() {
+        return this.displayName;
+    }
 
     // setUuid removed intentionally to keep identity immutable
-    public void setPrice(double newPrice) { this.price = newPrice; }
-    public void setDisplayName(String displayName) { this.displayName = displayName; }
+    public void setPrice(double newPrice) {
+        this.price = newPrice;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
 
     @Override
     public boolean equals(Object o) {
