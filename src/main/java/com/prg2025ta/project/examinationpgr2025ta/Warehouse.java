@@ -101,4 +101,15 @@ public class Warehouse {
             this.productsInStock.put(product, stockAvailable - n);
         }
     }
+
+    public Product getProductWithUuid(String uuid) {
+        for (Map.Entry<Product, Integer> entry : productsInStock.entrySet()) {
+            Product product = entry.getKey();
+            Integer amount = entry.getValue();
+
+            if (product.getUuid().toString().equals(uuid)) {
+                return product;
+            }
+        }
+    }
 }
