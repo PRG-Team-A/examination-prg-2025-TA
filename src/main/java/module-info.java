@@ -18,6 +18,7 @@ module com.prg2025ta.project.examinationpgr2025ta {
     exports com.prg2025ta.project.examinationpgr2025ta;
     exports com.prg2025ta.project.examinationpgr2025ta.api;
     exports com.prg2025ta.project.examinationpgr2025ta.api.models;
+    exports com.prg2025ta.project.examinationpgr2025ta.database;
 
     opens templates;
 }

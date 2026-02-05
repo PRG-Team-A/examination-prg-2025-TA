@@ -22,19 +22,24 @@ import java.util.Map;
 public class ProductController {
     private static final Logger log = LoggerFactory.getLogger(ProductController.class);
 
+    protected static List<ProductModel> getProductsAsModel(List<Product> products) {
+        List<ProductModel> productModelList = new ArrayList<>();
+
+        products.forEach((Product product) -> {
+            productModelList.add(new ProductModel(product.getDisplayName(), product.getPrice()));
+        });
+        return productModelList;
+    }
+
     @GetMapping("/")
     public String person(Model model) {
         // FIXME: This is only a proof-of-concept implementation and should be changed to include "real" implementation
 
         Map<Product, Integer> productsInStock = ApiApplication.warehouse.getProductsInStock();
-        List<ProductModel> productModelList = new ArrayList<>();
 
         log.info("There are {} products", productsInStock.size());
 
-        productsInStock.forEach((product, index) -> {
-            productModelList.add(new ProductModel(product.getDisplayName(), product.getPrice()));
-        });
-
+        List<ProductModel> productModelList = getProductsAsModel(productsInStock.keySet().stream().toList());
 
         model.addAttribute("products", productModelList);
         return "product";
