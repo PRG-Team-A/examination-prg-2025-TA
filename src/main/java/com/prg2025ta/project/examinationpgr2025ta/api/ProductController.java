@@ -23,6 +23,7 @@ public class ProductController {
     private static final Logger log = LoggerFactory.getLogger(ProductController.class);
 
     protected static List<ProductModel> getProductsAsModel(List<Product> products) {
+        // FIXME: Make this a function of ProductModel itself
         List<ProductModel> productModelList = new ArrayList<>();
 
         products.forEach((Product product) -> {
