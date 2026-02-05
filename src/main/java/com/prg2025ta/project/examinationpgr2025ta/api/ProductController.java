@@ -11,18 +11,25 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @Controller
 public class ProductController {
+    private static final Logger log = LoggerFactory.getLogger(ProductController.class);
+
     @GetMapping("/")
     public String person(Model model) {
         // FIXME: This is only a proof-of-concept implementation and should be changed to include "real" implementation
 
         Map<Product, Integer> productsInStock = ApiApplication.warehouse.getProductsInStock();
         List<ProductModel> productModelList = new ArrayList<>();
+
+        log.info("There are {} products", productsInStock.size());
 
         productsInStock.forEach((product, index) -> {
             productModelList.add(new ProductModel(product.getDisplayName(), product.getPrice()));
