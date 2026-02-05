@@ -107,7 +107,7 @@ public class DatabaseOperations {
             double price = resultSet.getDouble(3);
 
             products.add(new GroceryProduct(
-                    uuid,
+                    display_name,
                     price,
                     GroceryProduct.defaultDateOfExpiry,
                     GroceryProduct.defaultNeedsCooling,
