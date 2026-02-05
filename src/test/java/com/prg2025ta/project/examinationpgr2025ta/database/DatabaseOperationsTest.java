@@ -1,5 +1,6 @@
 package com.prg2025ta.project.examinationpgr2025ta.database;
 
+import com.prg2025ta.project.examinationpgr2025ta.SalesClass;
 import com.prg2025ta.project.examinationpgr2025ta.products.GroceryProduct;
 import com.prg2025ta.project.examinationpgr2025ta.products.Product;
 import static org.junit.jupiter.api.Assertions.*;
@@ -119,5 +120,13 @@ class DatabaseOperationsTest {
         boolean allProductsInDB = products.size() >= testProducts.size();
 
         assertTrue(allProductsInDB);
+    }
+
+    @Test
+    void insertSale() throws SQLException {
+        DatabaseOperations operations = DatabaseOperations.getInstance();
+        operations.insertSale(new SalesClass(1, "card", new ArrayList<Product>(), 5.0));
+
+        List<SalesClass> sales = operations.getAllSales();
     }
 }

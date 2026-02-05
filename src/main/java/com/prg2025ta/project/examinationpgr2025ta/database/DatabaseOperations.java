@@ -1,5 +1,6 @@
 package com.prg2025ta.project.examinationpgr2025ta.database;
 
+import com.prg2025ta.project.examinationpgr2025ta.SalesClass;
 import com.prg2025ta.project.examinationpgr2025ta.products.GroceryProduct;
 import com.prg2025ta.project.examinationpgr2025ta.products.Product;
 
@@ -133,7 +134,107 @@ public class DatabaseOperations {
         int[] result = statement.executeBatch();
         dbConnection.commit();
 
+        dbConnection.setAutoCommit(false);
+
         System.out.println("Deleted " + result.length + " products.");
+    }
+
+    public List<SalesClass> getAllSales() throws SQLException {
+        List<SalesClass> sales = new ArrayList<>();
+
+        PreparedStatement selectStatement = dbConnection.prepareStatement(
+                "SELECT sale_id, customerId, paymentMethod, total FROM sales;"
+        );
+
+        PreparedStatement getProductsFromSale = dbConnection.prepareStatement(
+                "SELECT product_id FROM sales_products WHERE sale_id = ?;"
+        );
+
+        ResultSet resultSet = selectStatement.executeQuery();
+
+        if (!resultSet.next()) {
+            return sales;
+        }
+
+        do {
+            int saleId = resultSet.getInt("sale_id");
+            int customerId = resultSet.getInt("customerId");
+            String paymentMethod = resultSet.getString("paymentMethod");
+            double total = resultSet.getDouble("total");
+
+            getProductsFromSale.setInt(1, saleId);
+            ResultSet productsResultSet = getProductsFromSale.executeQuery();
+
+            List<Product> products = new ArrayList<>();
+
+            if (productsResultSet.next()) {
+                do {
+                    String productId = productsResultSet.getString(1);
+                } while (productsResultSet.next());
+            }
+
+            SalesClass sale = new SalesClass(
+                    customerId,
+                    paymentMethod,
+                    new ArrayList<>(),
+                    total
+            );
+            sales.add(sale);
+
+        } while (resultSet.next());
+
+        return sales;
+    }
+
+    public void insertSale(SalesClass sale) throws SQLException {
+        dbConnection.setAutoCommit(false);
+
+        PreparedStatement salesInsertStatement = dbConnection
+                .prepareStatement(
+                        "INSERT INTO sales (customerId, paymentMethod, total) VALUES (?, ?, ?)",
+                        Statement.RETURN_GENERATED_KEYS
+                );
+
+        PreparedStatement getIdStatement = dbConnection.prepareStatement(
+                "SELECT last_insert_rowid();"
+        );
+
+
+        salesInsertStatement.setInt(1, sale.getCustomerID());
+        salesInsertStatement.setString(2, sale.getPaymentMethod());
+        salesInsertStatement.setDouble(3, sale.getTotal());
+        salesInsertStatement.executeUpdate();
+
+        PreparedStatement getInsertedSale = dbConnection.prepareStatement(
+                "SELECT sale_id FROM sales ORDER BY sale_id DESC LIMIT 1;"
+        );
+
+        int saleId = getInsertedSale.executeQuery().getInt(1);
+
+        PreparedStatement associateProductWithSaleStatement = dbConnection.prepareStatement(
+                "INSERT INTO sales_products (sale_id, product_id) VALUES (?, ?)"
+        );
+        associateProductWithSaleStatement.setInt(1, saleId);
+
+        List<Product> productsBought = sale.getProductsBought();
+        for (int i = 0; i < productsBought.size(); i++) {
+            associateProductWithSaleStatement.setString(2, productsBought.get(i).getUuid().toString());
+            associateProductWithSaleStatement.addBatch();
+        }
+
+        dbConnection.setAutoCommit(true);
+    }
+
+    private int getLastInsertedId() throws SQLException {
+        PreparedStatement getIdStatement = dbConnection.prepareStatement(
+                "SELECT last_insert_rowid();"
+        );
+
+        ResultSet resultSet = getIdStatement.executeQuery();
+        if (resultSet.next()) {
+            return resultSet.getInt(1);
+        }
+        return -1;
     }
 
     public void close() throws SQLException {
