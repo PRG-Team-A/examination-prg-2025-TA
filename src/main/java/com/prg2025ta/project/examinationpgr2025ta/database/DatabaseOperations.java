@@ -102,9 +102,9 @@ public class DatabaseOperations {
         }
 
         do {
-            String uuid = resultSet.getString(1);
-            String display_name = resultSet.getString(2);
-            double price = resultSet.getDouble(3);
+            String uuid = resultSet.getString("product_uuid");
+            String display_name = resultSet.getString("display_name");
+            double price = resultSet.getDouble("price");
 
             products.add(new GroceryProduct(
                     display_name,
