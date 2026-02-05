@@ -111,5 +111,6 @@ public class Warehouse {
                 return product;
             }
         }
+        return null;
     }
 }

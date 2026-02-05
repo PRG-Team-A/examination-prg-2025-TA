@@ -29,13 +29,21 @@ public class SessionCart {
     public void addProductToCart(Product product) {
         sale.getProductsBought().add(product);
     }
+    public void removeProductFromCart(String productUUID) {
+        for (int i = 0; i < sale.getProductsBought().size(); i++) {
+            if (sale.getProductsBought().get(i).getUuid().toString().equals(productUUID)) {
+                sale.getProductsBought().remove(i);
+                return;
+            }
+        }
+    }
 
     public double getTotal() {
-        AtomicReference<Double> total = new AtomicReference<>(0.0);
-        sale.getProductsBought().forEach(product -> {
-            total.updateAndGet(v -> (double) (v + product.getPrice()));
-        });
-        return total.get();
+        double total = 0.0;
+        for (Product product : sale.getProductsBought()) {
+            total += product.getPrice();
+        }
+        return total;
     }
 
     public void setCustomerId(int customerId) {

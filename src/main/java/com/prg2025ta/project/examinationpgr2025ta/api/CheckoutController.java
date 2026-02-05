@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 import java.util.Map;
@@ -24,12 +27,30 @@ public class CheckoutController {
 
     @GetMapping("/cart")
     public String cart(Model model) {
+        sessionCart.initialize();
+
+        List<ProductModel> models = getProductsAsModel(sessionCart.getProductsBought());
 
         Map<Product, Integer> productsInStock = ApiApplication.warehouse.getProductsInStock();
         List<ProductModel> productModelList = getProductsAsModel(productsInStock.keySet().stream().toList());
         model.addAttribute("products", productModelList);
-        model.addAttribute("productsInCart", sessionCart.getProductsBought());
+        model.addAttribute("productsInCart", models);
+        model.addAttribute("total", sessionCart.getTotal());
 
         return "cart";
+    }
+
+    @PostMapping("/cart/add/{productUUID}")
+    @ResponseBody
+    public String addProductToCart(@PathVariable String productUUID) {
+        sessionCart.addProductToCart(ApiApplication.warehouse.getProductWithUuid(productUUID));
+        return "ID: " + productUUID;
+    }
+
+    @PostMapping("/cart/remove/{productUUID}")
+    @ResponseBody
+    public String removeProductFromCart(@PathVariable String productUUID) {
+        sessionCart.removeProductFromCart(productUUID);
+        return "ID: " + productUUID;
     }
 }

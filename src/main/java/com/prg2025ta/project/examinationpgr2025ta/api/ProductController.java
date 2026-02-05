@@ -27,7 +27,7 @@ public class ProductController {
         List<ProductModel> productModelList = new ArrayList<>();
 
         products.forEach((Product product) -> {
-            productModelList.add(new ProductModel(product.getDisplayName(), product.getPrice()));
+            productModelList.add(new ProductModel(product.getDisplayName(), product.getPrice(), product.getUuid().toString()));
         });
         return productModelList;
     }
