@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS warehouse
 CREATE TABLE IF NOT EXISTS sales
 (
     sale_id integer primary key,
+    customerId integer,
     paymentMethod TEXT,
     total REAL
 );
