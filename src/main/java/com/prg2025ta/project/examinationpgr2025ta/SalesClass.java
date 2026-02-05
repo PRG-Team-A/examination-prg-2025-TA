@@ -10,6 +10,38 @@ public class SalesClass {
     private List<Product> productsBought;
     private double total;
 
+    public int getCustomerID() {
+        return customerID;
+    }
+
+    public void setCustomerID(int customerID) {
+        this.customerID = customerID;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public List<Product> getProductsBought() {
+        return productsBought;
+    }
+
+    public void setProductsBought(List<Product> productsBought) {
+        this.productsBought = productsBought;
+    }
+
+    public double getTotal() {
+        return total;
+    }
+
+    public void setTotal(double total) {
+        this.total = total;
+    }
+
     // Constructor
     public SalesClass(int customerID, String paymentMethod, List<Product> productsBought, double total) {
         this.customerID = customerID;
