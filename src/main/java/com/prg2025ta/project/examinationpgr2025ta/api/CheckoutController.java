@@ -1,15 +1,13 @@
 package com.prg2025ta.project.examinationpgr2025ta.api;
 
+import com.prg2025ta.project.examinationpgr2025ta.api.models.CheckoutModel;
 import com.prg2025ta.project.examinationpgr2025ta.api.models.ProductModel;
 import com.prg2025ta.project.examinationpgr2025ta.api.models.SessionCart;
 import com.prg2025ta.project.examinationpgr2025ta.products.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -52,5 +50,21 @@ public class CheckoutController {
     public String removeProductFromCart(@PathVariable String productUUID) {
         sessionCart.removeProductFromCart(productUUID);
         return "ID: " + productUUID;
+    }
+
+    @PostMapping("/cart/payment/method/{paymentMethod}")
+    @ResponseBody
+    public String setPaymentMethod(@PathVariable String paymentMethod) {
+        sessionCart.setPaymentMethod(paymentMethod);
+        return "Method: " + paymentMethod;
+    }
+
+    @PostMapping("/cart/checkout")
+    @ResponseBody
+    public String checkout(@ModelAttribute CheckoutModel checkoutModel) {
+        sessionCart.setPaymentMethod(checkoutModel.getPaymentMethod());
+        sessionCart.setCustomerId(Integer.parseInt(checkoutModel.getCustomerId()));
+
+        return "";
     }
 }

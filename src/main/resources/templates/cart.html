@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Cart</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <script>
     function removeProductFromCart(productUUID) {
@@ -19,6 +20,24 @@
         }).then(response => {
             if (response.ok) window.location.reload();
         })
+    }
+    function checkout() {
+        const customerIdField = document.getElementById("customerIdInput");
+        const paymentMethodField = document.getElementById("paymentMethodInput");
+
+        const data = new URLSearchParams();
+        for (const pair of new FormData(document.getElementById("checkoutForm"))) {
+            data.append(pair[0], pair[1]);
+        }
+
+        fetch("cart/checkout", {
+            method: "POST",
+            body: data
+        }).then(response => {
+            if (response.ok) window.location.href = "/";
+        })
+
+        return false;
     }
 </script>
 <body>
@@ -60,6 +79,19 @@
         </tr>
         </tbody>
     </table>
+</div>
+<div th:if="${productsInCart.size() > 0}">
+    <h2>Checkout</h2>
+    <!--/*@thymesVar id="CheckoutModel" type="com.prg2025ta.project.examinationpgr2025ta.api.models.CheckoutModel"*/-->
+    <form action="#" th:action="@{/cart/checkout}" th:object="${CheckoutModel}" method="post" onsubmit="return checkout();" id="checkoutForm">
+        <label for="customerIdInput">Customer ID:</label>
+        <input id="customerIdInput" type="number" name="customerId">
+
+        <label for="paymentMethodInput">Payment Method:</label>
+        <input type="text" id="paymentMethodInput" name="paymentMethod">
+
+        <input type="submit" value="Pay">
+    </form>
 </div>
 </body>
 </html>

@@ -6,16 +6,20 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h1>New Product</h1>
-<form action="#" th:action="@{/product}" th:object="${Product}" method="post">
-    <label for="displayNameInput">Display Name:</label>
-    <input id="displayNameInput" type="text" name="displayName" >
+<h1>Product page</h1>
+<p>If you are not an employee, please dont do anything and just go to our <a href="/cart">page for customers</a></p>
+<div>
+    <h2>New Product</h2>
+    <form action="#" th:action="@{/product}" th:object="${Product}" method="post">
+        <label for="displayNameInput">Display Name:</label>
+        <input id="displayNameInput" type="text" name="displayName">
 
-    <label for="priceInput">Price:</label>
-    <input type="number" name="price" id="priceInput" step=".01">
+        <label for="priceInput">Price:</label>
+        <input type="number" name="price" id="priceInput" step=".01">
 
-    <input type="submit">
-</form>
+        <input type="submit">
+    </form>
+</div>
 <h2>Products in Warehouse</h2>
 <div>
     <table>

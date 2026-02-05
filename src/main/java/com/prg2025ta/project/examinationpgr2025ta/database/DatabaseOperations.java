@@ -136,6 +136,16 @@ public class DatabaseOperations {
         System.out.println("Deleted " + result.length + " products.");
     }
 
+    /**
+     * <strong>ATTENTION!!!</strong>
+     * This is really dangerous and should be handled with care.
+     * It will delete ALL products from the production database.
+     */
+    public void nukeAllProducts() throws SQLException {
+        Statement nukeStatement = dbConnection.createStatement();
+        nukeStatement.execute("DELETE FROM products;");
+    }
+
     public void close() throws SQLException {
         dbConnection.close();
     }
