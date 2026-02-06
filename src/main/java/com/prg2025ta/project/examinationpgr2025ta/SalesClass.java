@@ -55,4 +55,20 @@ public class SalesClass {
         this.productsBought = productsBought;
         this.total = total;
     }
+
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(saleId);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj.getClass() != this.getClass()) return false;
+
+        final SalesClass other = (SalesClass) obj;
+        if (other.getSaleId() != this.getSaleId()) return false;
+
+        return true;
+    }
 }
