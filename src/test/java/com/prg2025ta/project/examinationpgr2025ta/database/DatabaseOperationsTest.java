@@ -130,10 +130,12 @@ class DatabaseOperationsTest {
     void insertSale() throws SQLException {
         DatabaseOperations operations = DatabaseOperations.getInstance();
         operations.insertMultipleProducts(testProducts);
-
-        operations.insertSale(new SalesClass(1, "card", testProducts, 5.0));
+        SalesClass testSale = new SalesClass(1, "card", testProducts, 5.0);
+        operations.insertSale(testSale);
 
         List<SalesClass> sales = operations.getAllSales();
+
         assertFalse(sales.isEmpty());
+        assertTrue(sales.contains(testSale));
     }
 }
