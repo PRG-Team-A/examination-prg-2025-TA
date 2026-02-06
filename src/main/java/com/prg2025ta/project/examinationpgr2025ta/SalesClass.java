@@ -5,6 +5,7 @@ import com.prg2025ta.project.examinationpgr2025ta.products.Product;
 
 public class SalesClass {
 
+    private int saleId;
     private int customerID;
     private String paymentMethod;
     private List<Product> productsBought;
@@ -42,8 +43,13 @@ public class SalesClass {
         this.total = total;
     }
 
+    public int getSaleId() { return saleId; }
+
     // Constructor
     public SalesClass(int customerID, String paymentMethod, List<Product> productsBought, double total) {
+        this(-1, customerID, paymentMethod, productsBought, total);
+    }
+    public SalesClass(int saleId, int customerID, String paymentMethod, List<Product> productsBought, double total) {
         this.customerID = customerID;
         this.paymentMethod = paymentMethod;
         this.productsBought = productsBought;
