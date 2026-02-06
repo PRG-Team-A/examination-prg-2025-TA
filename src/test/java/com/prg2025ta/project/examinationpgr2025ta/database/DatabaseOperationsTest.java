@@ -91,7 +91,7 @@ class DatabaseOperationsTest {
         operations.insertNewProduct(testProduct);
         Product returnedProduct = operations.getProductByUUID(testProduct.getUuid());
 
-        assertEquals(testProduct.getUuid(), testProduct.getUuid());
+        assertEquals(testProduct.getUuid(), returnedProduct.getUuid());
     }
 
     @Test
