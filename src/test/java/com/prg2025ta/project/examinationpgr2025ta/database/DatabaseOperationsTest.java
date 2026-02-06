@@ -125,8 +125,10 @@ class DatabaseOperationsTest {
     @Test
     void insertSale() throws SQLException {
         DatabaseOperations operations = DatabaseOperations.getInstance();
-        operations.insertSale(new SalesClass(1, "card", new ArrayList<Product>(), 5.0));
+
+        operations.insertSale(new SalesClass(1, "card", testProducts, 5.0));
 
         List<SalesClass> sales = operations.getAllSales();
+        assertFalse(sales.isEmpty());
     }
 }

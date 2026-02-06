@@ -165,18 +165,23 @@ public class DatabaseOperations {
             getProductsFromSale.setInt(1, saleId);
             ResultSet productsResultSet = getProductsFromSale.executeQuery();
 
+            List<String> productIds = new ArrayList<>();
             List<Product> products = new ArrayList<>();
 
             if (productsResultSet.next()) {
                 do {
-                    String productId = productsResultSet.getString(1);
+                    productIds.add(productsResultSet.getString(1));
                 } while (productsResultSet.next());
+            }
+
+            for (String productId : productIds) {
+                products.add(getProductByUUID(UUID.fromString(productId)));
             }
 
             SalesClass sale = new SalesClass(
                     customerId,
                     paymentMethod,
-                    new ArrayList<>(),
+                    products,
                     total
             );
             sales.add(sale);
@@ -186,7 +191,12 @@ public class DatabaseOperations {
         return sales;
     }
 
-    public void insertSale(SalesClass sale) throws SQLException {
+    /**
+     * @return True if the operation was successful, false if it was not.
+     * This operation is transaction based. If there is an error, the database will not
+     * be modified. (at least I hope so)
+     */
+    public boolean insertSale(SalesClass sale) throws SQLException {
         dbConnection.setAutoCommit(false);
 
         PreparedStatement salesInsertStatement = dbConnection
@@ -222,7 +232,21 @@ public class DatabaseOperations {
             associateProductWithSaleStatement.addBatch();
         }
 
+        int[] updateCounts = associateProductWithSaleStatement.executeBatch();
+        boolean everythingWasSuccessfull = true;
+
+        for (int i = 0; i < updateCounts.length; i++) {
+            if (updateCounts[i] == Statement.EXECUTE_FAILED) {
+                everythingWasSuccessfull = false;
+            }
+        }
+
+        if (!everythingWasSuccessfull) {
+            dbConnection.rollback();
+        }
+
         dbConnection.setAutoCommit(true);
+        return everythingWasSuccessfull;
     }
 
     private int getLastInsertedId() throws SQLException {
