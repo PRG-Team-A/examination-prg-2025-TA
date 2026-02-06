@@ -4,7 +4,6 @@ import com.prg2025ta.project.examinationpgr2025ta.SalesClass;
 import com.prg2025ta.project.examinationpgr2025ta.products.GroceryProduct;
 import com.prg2025ta.project.examinationpgr2025ta.products.Product;
 
-import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -15,9 +14,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class DatabaseOperations {
-    private Connection dbConnection;
-
     private static DatabaseOperations INSTANCE;
+    private Connection dbConnection;
 
     private DatabaseOperations(Connection connection) {
         this.dbConnection = connection;
@@ -31,13 +29,13 @@ public class DatabaseOperations {
     }
 
     public void insertNewProduct(Product product) throws SQLException {
-        List<Product> products = new ArrayList<>();
-        products.add(product);
+        List<Product> products = Collections.singletonList(product);
         insertMultipleProducts(products);
     }
 
     public void insertMultipleProducts(List<Product> products) throws SQLException {
         dbConnection.setAutoCommit(false);
+        Savepoint beforeInsertion = dbConnection.setSavepoint();
         try (PreparedStatement prepared = dbConnection.prepareStatement("INSERT INTO products (product_uuid, display_name, price) VALUES (?, ?, ?);")) {
             for (Product product : products) {
                 prepared.setString(1, product.getUuid().toString());
@@ -48,8 +46,12 @@ public class DatabaseOperations {
 
             int[] results = prepared.executeBatch();
             dbConnection.commit();
+            dbConnection.setAutoCommit(true);
 
             System.out.println("Inserted " + results.length + " products.");
+        } catch (SQLException sqlException) {
+            dbConnection.rollback(beforeInsertion);
+            throw sqlException;
         }
     }
 
@@ -63,7 +65,7 @@ public class DatabaseOperations {
 
         boolean resultSetIsEmpty = !resultSet.next();
 
-        if (!resultSetIsEmpty) {
+        if (resultSetIsEmpty) {
             return null;
         }
 
@@ -74,20 +76,18 @@ public class DatabaseOperations {
         long expiry_date = resultSet.getInt("expiry_date");
 
         if (product_id == null) return null;
+        if (display_name == null) return null;
 
-        if (display_name != null && price != 0 && needsCooling != 0 && expiry_date != 0) {
-            LocalDate dateOfExpiry = LocalDate.ofInstant(Instant.ofEpochSecond(expiry_date), ZoneId.of("UTC"));
-            boolean doesProductNeedCooling = needsCooling == 2;
-            return new GroceryProduct(
-                    display_name,
-                    price,
-                    dateOfExpiry,
-                    doesProductNeedCooling,
-                    UUID.fromString(product_id)
-            );
-        }
+        LocalDate dateOfExpiry = LocalDate.ofInstant(Instant.ofEpochSecond(expiry_date), ZoneId.of("UTC"));
+        boolean doesProductNeedCooling = needsCooling == 2;
+        return new GroceryProduct(
+                display_name,
+                price,
+                dateOfExpiry,
+                doesProductNeedCooling,
+                UUID.fromString(product_id)
+        );
 
-        return null;
     }
 
     public List<Product> getAllProducts() throws SQLException {

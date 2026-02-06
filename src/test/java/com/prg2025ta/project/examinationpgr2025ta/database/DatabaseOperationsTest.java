@@ -23,6 +23,9 @@ import java.util.List;
 
 // TODO: Implement test for the database access
 class DatabaseOperationsTest {
+    private static boolean shouldTestDataBaseBeDeleted =
+            System.getProperty("deleteDb", "true").equals("true");
+
     private List<Product> testProducts;
     private static File dbFile = new File("database.db");
     private static File testDbFile = new File("test_database.db");
@@ -57,6 +60,7 @@ class DatabaseOperationsTest {
     @AfterAll
     static void afterAll() throws SQLException {
         DatabaseOperations.getInstance().close();
+        if (!shouldTestDataBaseBeDeleted) return;
         if (!testDbFile.delete())
             System.out.println("Test DB could not be deleted!");
     }
@@ -125,6 +129,7 @@ class DatabaseOperationsTest {
     @Test
     void insertSale() throws SQLException {
         DatabaseOperations operations = DatabaseOperations.getInstance();
+        operations.insertMultipleProducts(testProducts);
 
         operations.insertSale(new SalesClass(1, "card", testProducts, 5.0));
 
