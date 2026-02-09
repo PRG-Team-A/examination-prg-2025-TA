@@ -1,9 +1,9 @@
 package com.prg2025ta.project.examinationpgr2025ta.database;
 
+import com.prg2025ta.project.examinationpgr2025ta.SalesClass;
 import com.prg2025ta.project.examinationpgr2025ta.products.GroceryProduct;
 import com.prg2025ta.project.examinationpgr2025ta.products.Product;
 
-import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -14,9 +14,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class DatabaseOperations {
-    private Connection dbConnection;
-
     private static DatabaseOperations INSTANCE;
+    private Connection dbConnection;
 
     private DatabaseOperations(Connection connection) {
         this.dbConnection = connection;
@@ -30,13 +29,13 @@ public class DatabaseOperations {
     }
 
     public void insertNewProduct(Product product) throws SQLException {
-        List<Product> products = new ArrayList<>();
-        products.add(product);
+        List<Product> products = Collections.singletonList(product);
         insertMultipleProducts(products);
     }
 
     public void insertMultipleProducts(List<Product> products) throws SQLException {
         dbConnection.setAutoCommit(false);
+        Savepoint beforeInsertion = dbConnection.setSavepoint();
         try (PreparedStatement prepared = dbConnection.prepareStatement("INSERT INTO products (product_uuid, display_name, price) VALUES (?, ?, ?);")) {
             for (Product product : products) {
                 prepared.setString(1, product.getUuid().toString());
@@ -47,8 +46,12 @@ public class DatabaseOperations {
 
             int[] results = prepared.executeBatch();
             dbConnection.commit();
+            dbConnection.setAutoCommit(true);
 
             System.out.println("Inserted " + results.length + " products.");
+        } catch (SQLException sqlException) {
+            dbConnection.rollback(beforeInsertion);
+            throw sqlException;
         }
     }
 
@@ -62,7 +65,7 @@ public class DatabaseOperations {
 
         boolean resultSetIsEmpty = !resultSet.next();
 
-        if (!resultSetIsEmpty) {
+        if (resultSetIsEmpty) {
             return null;
         }
 
@@ -73,20 +76,18 @@ public class DatabaseOperations {
         long expiry_date = resultSet.getInt("expiry_date");
 
         if (product_id == null) return null;
+        if (display_name == null) return null;
 
-        if (display_name != null && price != 0 && needsCooling != 0 && expiry_date != 0) {
-            LocalDate dateOfExpiry = LocalDate.ofInstant(Instant.ofEpochSecond(expiry_date), ZoneId.of("UTC"));
-            boolean doesProductNeedCooling = needsCooling == 2;
-            return new GroceryProduct(
-                    display_name,
-                    price,
-                    dateOfExpiry,
-                    doesProductNeedCooling,
-                    UUID.fromString(product_id)
-            );
-        }
+        LocalDate dateOfExpiry = LocalDate.ofInstant(Instant.ofEpochSecond(expiry_date), ZoneId.of("UTC"));
+        boolean doesProductNeedCooling = needsCooling == 2;
+        return new GroceryProduct(
+                display_name,
+                price,
+                dateOfExpiry,
+                doesProductNeedCooling,
+                UUID.fromString(product_id)
+        );
 
-        return null;
     }
 
     public List<Product> getAllProducts() throws SQLException {
@@ -133,7 +134,131 @@ public class DatabaseOperations {
         int[] result = statement.executeBatch();
         dbConnection.commit();
 
+        dbConnection.setAutoCommit(false);
+
         System.out.println("Deleted " + result.length + " products.");
+    }
+
+    public List<SalesClass> getAllSales() throws SQLException {
+        List<SalesClass> sales = new ArrayList<>();
+
+        PreparedStatement selectStatement = dbConnection.prepareStatement(
+                "SELECT sale_id, customerId, paymentMethod, total FROM sales;"
+        );
+
+        PreparedStatement getProductsFromSale = dbConnection.prepareStatement(
+                "SELECT product_id FROM sales_products WHERE sale_id = ?;"
+        );
+
+        ResultSet resultSet = selectStatement.executeQuery();
+
+        if (!resultSet.next()) {
+            return sales;
+        }
+
+        do {
+            int saleId = resultSet.getInt("sale_id");
+            int customerId = resultSet.getInt("customerId");
+            String paymentMethod = resultSet.getString("paymentMethod");
+            double total = resultSet.getDouble("total");
+
+            getProductsFromSale.setInt(1, saleId);
+            ResultSet productsResultSet = getProductsFromSale.executeQuery();
+
+            List<String> productIds = new ArrayList<>();
+            List<Product> products = new ArrayList<>();
+
+            if (productsResultSet.next()) {
+                do {
+                    productIds.add(productsResultSet.getString(1));
+                } while (productsResultSet.next());
+            }
+
+            for (String productId : productIds) {
+                products.add(getProductByUUID(UUID.fromString(productId)));
+            }
+
+            SalesClass sale = new SalesClass(
+                    customerId,
+                    paymentMethod,
+                    products,
+                    total
+            );
+            sales.add(sale);
+
+        } while (resultSet.next());
+
+        return sales;
+    }
+
+    /**
+     * @return True if the operation was successful, false if it was not.
+     * This operation is transaction based. If there is an error, the database will not
+     * be modified. (at least I hope so)
+     */
+    public boolean insertSale(SalesClass sale) throws SQLException {
+        dbConnection.setAutoCommit(false);
+
+        PreparedStatement salesInsertStatement = dbConnection
+                .prepareStatement(
+                        "INSERT INTO sales (customerId, paymentMethod, total) VALUES (?, ?, ?)",
+                        Statement.RETURN_GENERATED_KEYS
+                );
+
+        PreparedStatement getIdStatement = dbConnection.prepareStatement(
+                "SELECT last_insert_rowid();"
+        );
+
+
+        salesInsertStatement.setInt(1, sale.getCustomerID());
+        salesInsertStatement.setString(2, sale.getPaymentMethod());
+        salesInsertStatement.setDouble(3, sale.getTotal());
+        salesInsertStatement.executeUpdate();
+
+        PreparedStatement getInsertedSale = dbConnection.prepareStatement(
+                "SELECT sale_id FROM sales ORDER BY sale_id DESC LIMIT 1;"
+        );
+
+        int saleId = getInsertedSale.executeQuery().getInt(1);
+
+        PreparedStatement associateProductWithSaleStatement = dbConnection.prepareStatement(
+                "INSERT INTO sales_products (sale_id, product_id) VALUES (?, ?)"
+        );
+        associateProductWithSaleStatement.setInt(1, saleId);
+
+        List<Product> productsBought = sale.getProductsBought();
+        for (int i = 0; i < productsBought.size(); i++) {
+            associateProductWithSaleStatement.setString(2, productsBought.get(i).getUuid().toString());
+            associateProductWithSaleStatement.addBatch();
+        }
+
+        int[] updateCounts = associateProductWithSaleStatement.executeBatch();
+        boolean everythingWasSuccessfull = true;
+
+        for (int i = 0; i < updateCounts.length; i++) {
+            if (updateCounts[i] == Statement.EXECUTE_FAILED) {
+                everythingWasSuccessfull = false;
+            }
+        }
+
+        if (!everythingWasSuccessfull) {
+            dbConnection.rollback();
+        }
+
+        dbConnection.setAutoCommit(true);
+        return everythingWasSuccessfull;
+    }
+
+    private int getLastInsertedId() throws SQLException {
+        PreparedStatement getIdStatement = dbConnection.prepareStatement(
+                "SELECT last_insert_rowid();"
+        );
+
+        ResultSet resultSet = getIdStatement.executeQuery();
+        if (resultSet.next()) {
+            return resultSet.getInt(1);
+        }
+        return -1;
     }
 
     public void close() throws SQLException {
