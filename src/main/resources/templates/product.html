@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <title>Product Creation</title>
     <link rel="stylesheet" href="style.css">
+
+    <script>
+        function saveProducts() {
+            fetch("/product/save");
+        }
+    </script>
 </head>
 <body>
 <h1>Product page</h1>
@@ -17,7 +23,7 @@
         <label for="priceInput">Price:</label>
         <input type="number" name="price" id="priceInput" step=".01">
 
-        <input type="submit">
+        <input type="submit" value="Create">
     </form>
 </div>
 <h2>Products in Warehouse</h2>
@@ -36,6 +42,9 @@
         </tr>
         </tbody>
     </table>
+</div>
+<div>
+    <button onclick="saveProducts()">Save to warehouse</button>
 </div>
 </body>
 </html>

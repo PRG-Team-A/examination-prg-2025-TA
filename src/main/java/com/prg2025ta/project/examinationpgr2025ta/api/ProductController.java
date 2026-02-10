@@ -62,6 +62,7 @@ public class ProductController {
         Map<Product, Integer> productsInStock = ApiApplication.warehouse.getProductsInStock();
         DatabaseOperations databaseOperations = DatabaseOperations.getInstance();
 
+        // TODO: This is super ugly, dangerous and generally stupid. Should be changed
         databaseOperations.nukeAllProducts();
         databaseOperations.insertMultipleProducts(productsInStock.keySet().stream().toList());
         return "success";
