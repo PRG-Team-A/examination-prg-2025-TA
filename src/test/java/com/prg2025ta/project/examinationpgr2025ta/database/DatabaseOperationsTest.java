@@ -1,5 +1,6 @@
 package com.prg2025ta.project.examinationpgr2025ta.database;
 
+import com.prg2025ta.project.examinationpgr2025ta.SalesClass;
 import com.prg2025ta.project.examinationpgr2025ta.products.GroceryProduct;
 import com.prg2025ta.project.examinationpgr2025ta.products.Product;
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,6 +23,9 @@ import java.util.List;
 
 // TODO: Implement test for the database access
 class DatabaseOperationsTest {
+    private static boolean shouldTestDataBaseBeDeleted =
+            System.getProperty("deleteDb", "true").equals("true");
+
     private List<Product> testProducts;
     private static File dbFile = new File("database.db");
     private static File testDbFile = new File("test_database.db");
@@ -56,6 +60,7 @@ class DatabaseOperationsTest {
     @AfterAll
     static void afterAll() throws SQLException {
         DatabaseOperations.getInstance().close();
+        if (!shouldTestDataBaseBeDeleted) return;
         if (!testDbFile.delete())
             System.out.println("Test DB could not be deleted!");
     }
@@ -90,7 +95,7 @@ class DatabaseOperationsTest {
         operations.insertNewProduct(testProduct);
         Product returnedProduct = operations.getProductByUUID(testProduct.getUuid());
 
-        assertEquals(testProduct.getUuid(), testProduct.getUuid());
+        assertEquals(testProduct.getUuid(), returnedProduct.getUuid());
     }
 
     @Test
@@ -119,5 +124,18 @@ class DatabaseOperationsTest {
         boolean allProductsInDB = products.size() >= testProducts.size();
 
         assertTrue(allProductsInDB);
+    }
+
+    @Test
+    void insertSale() throws SQLException {
+        DatabaseOperations operations = DatabaseOperations.getInstance();
+        operations.insertMultipleProducts(testProducts);
+        SalesClass testSale = new SalesClass(1, "card", testProducts, 5.0);
+        operations.insertSale(testSale);
+
+        List<SalesClass> sales = operations.getAllSales();
+
+        assertFalse(sales.isEmpty());
+        assertTrue(sales.contains(testSale));
     }
 }
