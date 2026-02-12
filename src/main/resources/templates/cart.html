@@ -40,10 +40,24 @@
         return false;
     }
 </script>
+<style>
+    :has(> .error-message) {
+        display: flex;
+        flex-direction: row;
+        align-content: center;
+        justify-content: center;
+        margin: 2em;
+    }
+
+    .error-message {
+        color: red;
+    }
+</style>
 <body>
+<a href="/">Employee site</a>
 <h1>Cart</h1>
-<span th:text="${total}">TOTAL</span>
-<div>
+<span>Total: <span th:text="${total}">TOTAL</span> €</span>
+<div th:if="${#lists.size(products) > 0}">
     <h2>Products that can be bought</h2>
     <table>
         <thead>
@@ -61,6 +75,9 @@
         </tr>
         </tbody>
     </table>
+</div>
+<div th:if="${#lists.size(products) <= 0}">
+    <h2 class="error-message">There are currently no products available to buy! Sorry :|</h2>
 </div>
 <div>
     <h2>Products in cart</h2>

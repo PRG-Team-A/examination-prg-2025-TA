@@ -4,10 +4,16 @@
     <meta charset="UTF-8">
     <title>Product Creation</title>
     <link rel="stylesheet" href="style.css">
+
+    <script>
+        function saveProducts() {
+            fetch("/product/save");
+        }
+    </script>
 </head>
 <body>
 <h1>Product page</h1>
-<p>If you are not an employee, please dont do anything and just go to our <a href="/cart">page for customers</a></p>
+<p>If you are not an employee, please don't do anything and just go to our <a href="/cart">page for customers</a></p>
 <div>
     <h2>New Product</h2>
     <form action="#" th:action="@{/product}" th:object="${Product}" method="post">
@@ -17,7 +23,7 @@
         <label for="priceInput">Price:</label>
         <input type="number" name="price" id="priceInput" step=".01">
 
-        <input type="submit">
+        <input type="submit" value="Create">
     </form>
 </div>
 <h2>Products in Warehouse</h2>
@@ -37,7 +43,8 @@
         </tbody>
     </table>
 </div>
-<h2>Database</h2>
-<button onclick="fetch('/product/save').then((res) => { if (res.ok) window.alert('Saved'); })">Save products</button>
+<div>
+    <button onclick="saveProducts()">Save to warehouse</button>
+</div>
 </body>
 </html>
