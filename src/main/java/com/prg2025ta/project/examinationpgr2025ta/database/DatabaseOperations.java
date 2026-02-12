@@ -1,5 +1,6 @@
 package com.prg2025ta.project.examinationpgr2025ta.database;
 
+import com.prg2025ta.project.examinationpgr2025ta.SalesClass;
 import com.prg2025ta.project.examinationpgr2025ta.products.GroceryProduct;
 import com.prg2025ta.project.examinationpgr2025ta.products.Product;
 
