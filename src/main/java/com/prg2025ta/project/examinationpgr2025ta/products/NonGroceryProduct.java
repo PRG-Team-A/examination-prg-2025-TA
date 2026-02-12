@@ -3,19 +3,14 @@ package com.prg2025ta.project.examinationpgr2025ta.products;
 import java.time.LocalDate;
 import java.util.UUID;
 
-/**
- * Non-grocery product type with tax category, premium flag (for loyalty discounts),
- * and optional sale/availability window.
- */
+
 public class NonGroceryProduct extends Product {
     public static final double DEFAULT_PREMIUM_DISCOUNT = 0.10; // 10% discount for premium customers
 
-    // CHANGED: Removed equals(Product other) overload so this class relies on Product.equals(Object)/hashCode().
-
     private TaxCategory taxCategory;
     private boolean isPremium;
-    private LocalDate saleStartDate; // nullable - when product becomes available on sale
-    private LocalDate saleEndDate;   // nullable - when sale ends
+    private LocalDate saleStartDate; //count when product becomes available on sale
+    private LocalDate saleEndDate;   //count when sale ends
 
     public NonGroceryProduct(String displayName) {
         this(displayName, Product.defaultPrice);
@@ -71,10 +66,7 @@ public class NonGroceryProduct extends Product {
         this.saleEndDate = saleEndDate;
     }
 
-    /**
-     * Checks if the product is available (in terms of sale/availability window) on the provided date.
-     * If no window is set, returns true.
-     */
+    //check product available/not
     public boolean isAvailable(LocalDate date) {
         if (date == null) return true;
         if (saleStartDate != null && date.isBefore(saleStartDate))
@@ -84,10 +76,7 @@ public class NonGroceryProduct extends Product {
         return true;
     }
 
-    /**
-     * Calculates price including tax (based on the product's TaxCategory).
-     * If base price is NaN, returns Double.NaN.
-     */
+    //calculate tax depends on its category
     public double getPriceWithTax() {
         double basePrice = getPrice();
         if (Double.isNaN(basePrice))
@@ -95,10 +84,7 @@ public class NonGroceryProduct extends Product {
         return basePrice * (1.0 + (taxCategory == null ? TaxCategory.STANDARD.getRate() : taxCategory.getRate()));
     }
 
-    /**
-     * Returns the effective price a customer should pay considering premium discount.
-     * If premiumCustomer==true and the product is marked premium, a discount is applied to the base price.
-     */
+    //Returns the final price, applying a premium discount when eligible
     public double getPriceForCustomer(boolean premiumCustomer) {
         double base = getPrice();
         if (Double.isNaN(base)) return Double.NaN;

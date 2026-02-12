@@ -2,16 +2,9 @@ package com.prg2025ta.project.examinationpgr2025ta.products;
 
 import java.util.UUID;
 
-/**
- * Product sold by weight (e.g. items on a scale). The pricePerKg is stored separately
- * and can be used to calculate the price for a measured weight.
- *
- * Note: Product.price is left as Product.defaultPrice (NaN) because final price depends on measured weight.
- */
+//Product sold by weight; final price depends on measured weight.
 public class WeightBasedProduct extends Product {
     private double pricePerKg;
-
-    // CHANGED: Removed equals(Product other) overload so equality is consistent (Product.equals(Object)/hashCode()).
 
     public WeightBasedProduct(String displayName, double pricePerKg) {
         this(displayName, pricePerKg, UUID.randomUUID());

@@ -3,10 +3,6 @@ package com.prg2025ta.project.examinationpgr2025ta.products;
 import java.time.LocalDate;
 import java.util.UUID;
 
-/**
- * Example of a concrete non-grocery product type: electronics.
- * Extends NonGroceryProduct to reuse tax/premium/availability logic and adds a warranty field.
- */
 public class ElectronicProduct extends NonGroceryProduct {
     private int warrantyMonths; // typical warranty length in months
 
