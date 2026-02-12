@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.HtmlUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -42,21 +43,21 @@ public class CheckoutController {
     @ResponseBody
     public String addProductToCart(@PathVariable String productUUID) {
         sessionCart.addProductToCart(ApiApplication.warehouse.getProductWithUuid(productUUID));
-        return "ID: " + productUUID;
+        return "ID: " + HtmlUtils.htmlEscape(productUUID);
     }
 
     @PostMapping("/cart/remove/{productUUID}")
     @ResponseBody
     public String removeProductFromCart(@PathVariable String productUUID) {
         sessionCart.removeProductFromCart(productUUID);
-        return "ID: " + productUUID;
+        return "ID: " + HtmlUtils.htmlEscape(productUUID);
     }
 
     @PostMapping("/cart/payment/method/{paymentMethod}")
     @ResponseBody
     public String setPaymentMethod(@PathVariable String paymentMethod) {
         sessionCart.setPaymentMethod(paymentMethod);
-        return "Method: " + paymentMethod;
+        return "Method: " + HtmlUtils.htmlEscape(paymentMethod);
     }
 
     @PostMapping("/cart/checkout")
