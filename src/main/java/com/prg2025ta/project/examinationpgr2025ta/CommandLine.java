@@ -33,5 +33,23 @@ public class CommandLine {
 
                     List<Product> productsBought = new ArrayList<>();
 
-                    for (int i = 0; i < productNames.length; i++) {
+                  for (int i = 0; i < productNames.length; i++) {
                         String name = productNames[i].trim();
+                        Product product = new Product(name);
+                            productsBought.add(product);
+                  }
+                SalesClass sale = new SalesClass(customerID, paymentMethod, total, productsBought);
+                salesRecords.add(sale);
+                }
+                else if (command.equalsIgnoreCase("list-sales") || command.equals("2")) {
+                    for (SalesClass sale : salesRecords) {
+                        System.out.println(sale);
+                       }
+                }
+                else if (command.equalsIgnoreCase("exit") || command.equals("3")) {
+                System.out.println("Goodbye!");
+                break;
+                }
+                else {
+                System.out.println("Invalid command. Please try again.");
+                }
