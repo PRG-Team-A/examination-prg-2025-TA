@@ -17,4 +17,11 @@ public class SalesClass {
         this.productsBought = productsBought;
         this.total = total;
     }
+    public String toString() {
+        return "Sale{" +
+               "customerID=" + customerID +
+               ", paymentMethod='" + paymentMethod + '\'' +
+               ", total=" + total +
+               ", products=" + products +
+               '}';
 }
