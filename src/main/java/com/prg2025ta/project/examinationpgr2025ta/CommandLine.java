@@ -1,71 +1,37 @@
 package com.prg2025ta.project.examinationpgr2025ta;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import com.prg2025ta.project.examinationpgr2025ta.products.Product;
 public class CliMain {
-
     private static List<SalesClass> salesRecords = new ArrayList<>();
     public static void main(String[] args) {
-        if (args.length == 0) {
-            printHelp();
-            return;
-        }
-        
-        String command = args[0];
-        if (command.equals("add-sale")) {
-            if (args.length < 5) {
-                System.out.println("Usage: add-sale <customerID> <paymentMethod> <total> <product1,product2,...>");
-                return;
-            }
-            int customerID = 0;
-            double total = 0.0;
-            try {
-                customerID = Integer.parseInt(args[1]);
-                total = Double.parseDouble(args[3]);
-            } catch (NumberFormatException e) {
-                System.out.println("Customer ID and Total must be numbers.");
-                return;
-            }
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("\nChoose a command:");
+            System.out.println("1. add-sale");
+            System.out.println("2. list-sales");
+            System.out.println("3. exit");
+            System.out.print("Enter command: ");
+            String command = scanner.nextLine();
 
-            String paymentMethod = args[2];
-            String[] productNames = args[4].split(",");
+            if (command.equalsIgnoreCase("add-sale") || command.equals("1")) {
+                try {
+                    System.out.print("Enter Customer ID: ");
+                    int customerID = Integer.parseInt(scanner.nextLine());
+                    
+                    System.out.print("Enter Payment Method: ");
+                    String paymentMethod = scanner.nextLine();
+                    
+                    System.out.print("Enter Total Amount: ");
+                    double total = Double.parseDouble(scanner.nextLine());
+                    
+                    System.out.print("Enter products (comma separated): ");
+                    String productInput = scanner.nextLine();
 
-            List<Product> productsBought = new ArrayList<>();
-            for (int i = 0; i < productNames.length; i++) {
-                productsBought.add(new Product(productNames[i]));
-            }
+                    String[] productNames = productInput.split(",");
 
-            SalesClass sale = new SalesClass(customerID, paymentMethod, productsBought, total);
-            salesRecords.add(sale);
-            System.out.println("Sale added successfully.");
+                    List<Product> productsBought = new ArrayList<>();
 
-        } else if (command.equals("list-sales")) {
-            if (salesRecords.size() == 0) {
-                System.out.println("No sales records found.");
-            } else {
-                for (int i = 0; i < salesRecords.size(); i++) {
-                    SalesClass sale = salesRecords.get(i);
-                    System.out.print("CustomerID: " + sale.getCustomerID());
-                    System.out.print(", Payment: " + sale.getPaymentMethod());
-                    System.out.print(", Total: " + sale.getTotal());
-                    System.out.print(", Products: ");
-                    for (int j = 0; j < sale.getProductsBought().size(); j++) {
-                        System.out.print(sale.getProductsBought().get(j).getName());
-                        if (j < sale.getProductsBought().size() - 1) {
-                            System.out.print(", ");
-                        }
-                    }
-                    System.out.println();
-                }
-            }
-        } else {
-            printHelp();
-        }
-    }
-
-    private static void printHelp() {
-        System.out.println("Available commands:");
-        System.out.println("  add-sale <customerID> <paymentMethod> <total> <product1,product2,...>");
-        System.out.println("  list-sales");
-    }
-}
+                    for (int i = 0; i < productNames.length; i++) {
+                        String name = productNames[i].trim();
