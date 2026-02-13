@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import com.prg2025ta.project.examinationpgr2025ta.products.Product;
-public class CliMain {
+public class CommandLine {
     private static List<SalesClass> salesRecords = new ArrayList<>();
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
