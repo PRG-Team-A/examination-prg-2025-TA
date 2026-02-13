@@ -1,14 +1,17 @@
 package com.prg2025ta.project.examinationpgr2025ta;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import com.prg2025ta.project.examinationpgr2025ta.products.Product;
+
 public class CommandLine {
-    
+
     private static List<SalesClass> salesRecords = new ArrayList<>();
-    
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+
         while (true) {
             System.out.println("\nChoose a command:");
             System.out.println("1. add-sale");
@@ -20,7 +23,6 @@ public class CommandLine {
 
             // ADD SALE
             if (command.equalsIgnoreCase("add-sale") || command.equals("1")) {
-
                 try {
                     System.out.print("Enter Customer ID: ");
                     int customerID = Integer.parseInt(scanner.nextLine());
@@ -35,13 +37,10 @@ public class CommandLine {
                     String productInput = scanner.nextLine();
 
                     String[] productNames = productInput.split(",");
-
                     List<Product> productsBought = new ArrayList<>();
 
-                    for (int i = 0; i < productNames.length; i++) {
-                        String name = productNames[i].trim();
-                        Product product = new Product(name);
-                        productsBought.add(product);
+                    for (String name : productNames) {
+                        productsBought.add(new Product(name.trim()));
                     }
 
                     SalesClass sale = new SalesClass(customerID, paymentMethod, total, productsBought);
@@ -50,14 +49,18 @@ public class CommandLine {
                     System.out.println("Sale added successfully.");
 
                 } catch (Exception e) {
-                    System.out.println("Invalid input!");
+                    System.out.println("Invalid input! Try again.");
                 }
             }
 
             // LIST SALES
             else if (command.equalsIgnoreCase("list-sales") || command.equals("2")) {
-                for (SalesClass sale : salesRecords) {
-                    System.out.println(sale);
+                if (salesRecords.isEmpty()) {
+                    System.out.println("No sales recorded yet.");
+                } else {
+                    for (SalesClass sale : salesRecords) {
+                        System.out.println(sale);
+                    }
                 }
             }
 
@@ -67,7 +70,7 @@ public class CommandLine {
                 break;
             }
 
-            // INVALID
+            // INVALID COMMAND
             else {
                 System.out.println("Invalid command. Please try again.");
             }
