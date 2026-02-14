@@ -76,6 +76,7 @@ public class SalesClass {
                "customerID=" + customerID +
                ", paymentMethod='" + paymentMethod + '\'' +
                ", total=" + total +
-               ", products=" + products +
+               ", products=" + this.productsBought +
                '}';
+    }
 }

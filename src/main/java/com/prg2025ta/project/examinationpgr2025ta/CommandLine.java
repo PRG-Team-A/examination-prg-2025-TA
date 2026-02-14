@@ -3,13 +3,18 @@ package com.prg2025ta.project.examinationpgr2025ta;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
+
 import com.prg2025ta.project.examinationpgr2025ta.products.Product;
 
 public class CommandLine {
 
     private static List<SalesClass> salesRecords = new ArrayList<>();
+    private static Warehouse warehouse;
 
     public static void main(String[] args) {
+        warehouse = new Warehouse();
+        Set<Product> productsAvailable = warehouse.getProductsInStock().keySet();
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
@@ -40,10 +45,14 @@ public class CommandLine {
                     List<Product> productsBought = new ArrayList<>();
 
                     for (String name : productNames) {
-                        productsBought.add(new Product(name.trim()));
+                        for (Product product : productsAvailable) {
+                            if (product.getDisplayName().equalsIgnoreCase(name.trim())) {
+                                productsBought.add(product);
+                            }
+                        }
                     }
 
-                    SalesClass sale = new SalesClass(customerID, paymentMethod, total, productsBought);
+                    SalesClass sale = new SalesClass(customerID, paymentMethod, productsBought, total);
                     salesRecords.add(sale);
 
                     System.out.println("Sale added successfully.");
