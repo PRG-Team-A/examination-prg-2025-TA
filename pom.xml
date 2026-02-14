@@ -10,6 +10,9 @@
     <name>examination-pgr-2025-TA</name>
 
     <properties>
+        <java.version>25</java.version>
+        <maven.compiler.source>25</maven.compiler.source>
+        <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>5.12.1</junit.version>
         <org.springframework.version>5.2.8.RELEASE</org.springframework.version>
