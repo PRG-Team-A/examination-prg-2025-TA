@@ -2,7 +2,7 @@ package com.prg2025ta.project.examinationpgr2025ta.products;
 
 import java.util.UUID;
 
-//Product sold by weight; final price depends on measured weight.
+
 public class WeightBasedProduct extends Product {
     private double pricePerKg;
 

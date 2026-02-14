@@ -6,14 +6,12 @@ import java.util.Objects;
 public class Product {
     public static final double defaultPrice = Double.NaN;
 
-    // CHANGED: Made uuid final and implemented equals(Object)/hashCode() based on uuid; removed setUuid(...) to keep identity stable.
-
     private final UUID uuid;
     private double price;
     private String displayName;
 
     public Product(String displayName, double price, UUID uuid) {
-        this.uuid = Objects.requireNonNull(uuid, "uuid must not be null");
+        this.uuid = Objects.requireNonNull(uuid);
         this.displayName = displayName;
         this.price = price;
     }

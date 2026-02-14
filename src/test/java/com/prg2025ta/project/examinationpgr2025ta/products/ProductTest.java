@@ -63,6 +63,6 @@ class ProductTest {
 
     @Test
     void testEquals() {
-        assertTrue(testProduct.equals(testProduct));
+        assertTrue(testProduct.equals(testProduct)); //??
     }
 }
