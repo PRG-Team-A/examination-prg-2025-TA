@@ -71,4 +71,12 @@ public class SalesClass {
 
         return true;
     }
+    public String toString() {
+        return "Sale{" +
+               "customerID=" + customerID +
+               ", paymentMethod='" + paymentMethod + '\'' +
+               ", total=" + total +
+               ", products=" + this.productsBought +
+               '}';
+    }
 }
