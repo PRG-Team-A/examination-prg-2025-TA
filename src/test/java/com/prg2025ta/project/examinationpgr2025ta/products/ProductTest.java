@@ -1,6 +1,5 @@
 package com.prg2025ta.project.examinationpgr2025ta.products;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -26,6 +25,13 @@ class ProductTest {
     }
 
     @Test
+    void constructorSetsUuid() {
+        UUID expectedUUID = UUID.randomUUID();
+        Product product = new Product("TestProduct", 12.1, expectedUUID);
+        assertEquals(expectedUUID, product.getUuid());
+    }
+
+    @Test
     void getPrice() throws NoSuchFieldException, IllegalAccessException {
         final Field priceField = testProduct.getClass().getDeclaredField("price");
         priceField.setAccessible(true);
@@ -39,15 +45,6 @@ class ProductTest {
         displayNameField.setAccessible(true);
         String expectedDisplayName = (String) displayNameField.get(testProduct);
         assertEquals(expectedDisplayName, testProduct.getDisplayName());
-    }
-
-    @Test
-    void setUuid() {
-        UUID expectedUUID = UUID.randomUUID();
-
-        testProduct.setUuid(expectedUUID);
-
-        assertEquals(expectedUUID, testProduct.getUuid());
     }
 
     @Test
@@ -66,6 +63,6 @@ class ProductTest {
 
     @Test
     void testEquals() {
-        assertTrue(testProduct.equals(testProduct));
+        assertTrue(testProduct.equals(testProduct)); //??
     }
 }
