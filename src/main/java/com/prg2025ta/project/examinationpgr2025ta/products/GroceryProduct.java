@@ -13,11 +13,6 @@ public class GroceryProduct extends Product {
     private LocalDate dateOfExpiry;
     private boolean needsCooling;
 
-    @Override
-    public boolean equals(Product other) {
-        return other.getUuid().equals(this.getUuid());
-    }
-
     public LocalDate getDateOfExpiry() { return dateOfExpiry; }
     public boolean needsToBeCooled() { return needsCooling; }
 

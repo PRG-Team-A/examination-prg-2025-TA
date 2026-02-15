@@ -1,27 +1,51 @@
 package com.prg2025ta.project.examinationpgr2025ta.products;
 
 import java.util.UUID;
+import java.util.Objects;
 
 public class Product {
     public static final double defaultPrice = Double.NaN;
 
-    private UUID uuid;
+    private final UUID uuid;
     private double price;
     private String displayName;
 
     public Product(String displayName, double price, UUID uuid) {
-        this.uuid = uuid;
+        this.uuid = Objects.requireNonNull(uuid);
         this.displayName = displayName;
         this.price = price;
     }
 
-    public UUID getUuid() { return this.uuid; }
-    public double getPrice() { return this.price; }
-    public String getDisplayName() { return this.displayName; }
+    public UUID getUuid() {
+        return this.uuid;
+    }
 
-    public void setUuid(UUID uuid) { this.uuid = uuid; }
-    public void setPrice(double newPrice) { this.price = newPrice; }
-    public void setDisplayName(String displayName) { this.displayName = displayName; }
+    public double getPrice() {
+        return this.price;
+    }
 
-    public boolean equals(Product other) { return this.uuid.equals(other.getUuid()); }
+    public String getDisplayName() {
+        return this.displayName;
+    }
+
+    // setUuid removed intentionally to keep identity immutable
+    public void setPrice(double newPrice) {
+        this.price = newPrice;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Product other)) return false;
+        return this.uuid.equals(other.uuid);
+    }
+
+    @Override
+    public int hashCode() {
+        return uuid.hashCode();
+    }
 }
