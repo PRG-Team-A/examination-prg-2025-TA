@@ -7,10 +7,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Field;
 import java.time.LocalDate;
-import java.util.Map;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -47,11 +44,7 @@ class WarehouseTest {
         amountOfProductInWarehouse = warehouse.getProductsInStock().get(testProduct);
         assertEquals(2, amountOfProductInWarehouse);
 
-        try {
-            amountOfProductInWarehouse = warehouse.getProductsInStock().get(unknownProduct);
-        } catch (NullPointerException e) {
-            amountOfProductInWarehouse = 0;
-        }
+        amountOfProductInWarehouse = warehouse.getProductsInStock().getOrDefault(unknownProduct, 0);
         assertEquals(0, amountOfProductInWarehouse);
     }
 
@@ -86,7 +79,7 @@ class WarehouseTest {
     void removeFromWarehouse() {
         warehouse.acceptDelivery(testProduct, testProduct, expiredProduct);
 
-        warehouse.removeFromWarehouse(testProduct, 2);;
+        warehouse.removeFromWarehouse(testProduct, 2);
 
         assertEquals(0, warehouse.getAmountOfProductInStock(testProduct));
         assertEquals(1, warehouse.getAmountOfProductInStock(expiredProduct));
