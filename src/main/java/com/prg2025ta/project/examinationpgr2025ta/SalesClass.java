@@ -1,10 +1,10 @@
 package com.prg2025ta.project.examinationpgr2025ta;
-import java.util.Arrays;
 import java.util.List;
 import com.prg2025ta.project.examinationpgr2025ta.products.Product;
 
 public class SalesClass {
 
+    private int saleId;
     private int customerID;
     private String paymentMethod;
     private List<Product> productsBought;
@@ -42,6 +42,10 @@ public class SalesClass {
         this.total = total;
     }
 
+    public int getSaleId() {
+        return saleId;
+    }
+
     // Constructor
     public SalesClass(int customerID, String paymentMethod, List<Product> productsBought, double total) {
         this(-1, customerID, paymentMethod, productsBought, total);
@@ -58,15 +62,14 @@ public class SalesClass {
         return Integer.hashCode(saleId);
     }
 
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj.getClass() != this.getClass()) return false;
 
         final SalesClass other = (SalesClass) obj;
-        if (other.getSaleId() != this.getSaleId()) return false;
-
-        return true;
+        return other.getSaleId() == this.getSaleId();
     }
     public String toString() {
         return "Sale{" +
