@@ -50,6 +50,7 @@ public class NonGroceryProduct extends Product {
         double basePrice = getPrice();
         if (Double.isNaN(basePrice))
             return Double.NaN;
-        return basePrice * (1.0 + (taxCategory == null ? TaxCategory.STANDARD.getRate() : taxCategory.getRate()));
+        if (taxCategory == null) taxCategory = TaxCategory.STANDARD;
+        return basePrice * (1.0 + taxCategory.getRate());
     }
 }
