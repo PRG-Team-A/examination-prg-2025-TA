@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cart</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<script>
+    function removeProductFromCart(productUUID) {
+        fetch(`/cart/remove/${productUUID}`, {
+            method: "POST"
+        }).then(response => {
+            if (response.ok) window.location.reload();
+        })
+    }
+    function addProductToCart(productUUID) {
+        console.log(productUUID);
+        fetch(`/cart/add/${productUUID}`, {
+            method: "POST"
+        }).then(response => {
+            if (response.ok) window.location.reload();
+        })
+    }
+    function checkout() {
+        const customerIdField = document.getElementById("customerIdInput");
+        const paymentMethodField = document.getElementById("paymentMethodInput");
+
+        const data = new URLSearchParams();
+        for (const pair of new FormData(document.getElementById("checkoutForm"))) {
+            data.append(pair[0], pair[1]);
+        }
+
+        fetch("cart/checkout", {
+            method: "POST",
+            body: data
+        }).then(response => {
+            if (response.ok) window.location.href = "/";
+        })
+
+        return false;
+    }
+</script>
+<style>
+    :has(> .error-message) {
+        display: flex;
+        flex-direction: row;
+        align-content: center;
+        justify-content: center;
+        margin: 2em;
+    }
+
+    .error-message {
+        color: red;
+    }
+</style>
+<body>
+<a href="/">Employee site</a>
+<h1>Cart</h1>
+<span>Total: <span th:text="${total}">TOTAL</span> €</span>
+<div th:if="${#lists.size(products) > 0}">
+    <h2>Products that can be bought</h2>
+    <table>
+        <thead>
+        <tr>
+            <td>Product</td>
+            <td>Price</td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="product: ${products}">
+            <td th:text="${product.getDisplayName()}">DISPLAY_NAME</td>
+            <td th:text="${product.getPrice()}">PRICE</td>
+            <td><button
+                    th:data-id="${product.getProductUUID()}" th:onclick="|addProductToCart(this.getAttribute('data-id'))|">Add to cart</button></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div th:if="${#lists.size(products) <= 0}">
+    <h2 class="error-message">There are currently no products available to buy! Sorry :|</h2>
+</div>
+<div>
+    <h2>Products in cart</h2>
+    <table>
+        <thead>
+        <tr>
+            <td>Product</td>
+            <td>Price</td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="product: ${productsInCart}">
+            <td th:text="${product.getDisplayName()}">DISPLAY_NAME</td>
+            <td th:text="${product.getPrice()}">PRICE</td>
+            <td><button type="button" th:data-id="${product.getProductUUID()}" th:onclick="|removeProductFromCart(this.getAttribute('data-id'))|">Remove from cart</button></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div th:if="${productsInCart.size() > 0}">
+    <h2>Checkout</h2>
+    <!--/*@thymesVar id="CheckoutModel" type="com.prg2025ta.project.examinationpgr2025ta.api.models.CheckoutModel"*/-->
+    <form action="#" th:action="@{/cart/checkout}" th:object="${CheckoutModel}" method="post" onsubmit="return checkout();" id="checkoutForm">
+        <label for="customerIdInput">Customer ID:</label>
+        <input id="customerIdInput" type="number" name="customerId">
+
+        <label for="paymentMethodInput">Payment Method:</label>
+        <input type="text" id="paymentMethodInput" name="paymentMethod">
+
+        <input type="submit" value="Pay">
+    </form>
+</div>
+</body>
+</html>

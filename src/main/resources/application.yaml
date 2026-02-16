@@ -14,3 +14,7 @@ spring:
       poll-interval: 1s
     livereload:
       enabled: true
+  web:
+    error:
+      whitelabel:
+        enabled: false

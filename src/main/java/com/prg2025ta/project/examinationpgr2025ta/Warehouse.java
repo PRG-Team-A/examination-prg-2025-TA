@@ -1,9 +1,11 @@
 package com.prg2025ta.project.examinationpgr2025ta;
 
+import com.prg2025ta.project.examinationpgr2025ta.database.DatabaseOperations;
 import com.prg2025ta.project.examinationpgr2025ta.exceptions.OutOfStockException;
 import com.prg2025ta.project.examinationpgr2025ta.products.GroceryProduct;
 import com.prg2025ta.project.examinationpgr2025ta.products.Product;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -23,6 +25,10 @@ public class Warehouse {
      * associated with that product
      */
     public void acceptDelivery(Product... products) {
+        acceptDelivery(Arrays.stream(products).toList());
+    }
+
+    public void acceptDelivery(List<Product> products) {
         for (Product product : products) {
             if (productsInStock.containsKey(product)) {
                 this.productsInStock.put(product, this.productsInStock.get(product) + 1);
@@ -30,6 +36,12 @@ public class Warehouse {
                 this.productsInStock.put(product, 1);
             }
         }
+    }
+
+
+    public void loadFromDatabase(DatabaseOperations databaseOperations) throws SQLException {
+        List<Product> products = databaseOperations.getAllProducts();
+        acceptDelivery(products);
     }
 
     /**
@@ -88,5 +100,17 @@ public class Warehouse {
         } else {
             this.productsInStock.put(product, stockAvailable - n);
         }
+    }
+
+    public Product getProductWithUuid(String uuid) {
+        for (Map.Entry<Product, Integer> entry : productsInStock.entrySet()) {
+            Product product = entry.getKey();
+            Integer amount = entry.getValue();
+
+            if (product.getUuid().toString().equals(uuid)) {
+                return product;
+            }
+        }
+        return null;
     }
 }
