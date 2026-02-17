@@ -54,61 +54,90 @@
     }
 </style>
 <body>
-<a href="/">Employee site</a>
-<h1>Cart</h1>
-<span>Total: <span th:text="${total}">TOTAL</span> €</span>
-<div th:if="${#lists.size(products) > 0}">
-    <h2>Products that can be bought</h2>
-    <table>
-        <thead>
-        <tr>
-            <td>Product</td>
-            <td>Price</td>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="product: ${products}">
-            <td th:text="${product.getDisplayName()}">DISPLAY_NAME</td>
-            <td th:text="${product.getPrice()}">PRICE</td>
-            <td><button
-                    th:data-id="${product.getProductUUID()}" th:onclick="|addProductToCart(this.getAttribute('data-id'))|">Add to cart</button></td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-<div th:if="${#lists.size(products) <= 0}">
-    <h2 class="error-message">There are currently no products available to buy! Sorry :|</h2>
-</div>
-<div>
-    <h2>Products in cart</h2>
-    <table>
-        <thead>
-        <tr>
-            <td>Product</td>
-            <td>Price</td>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="product: ${productsInCart}">
-            <td th:text="${product.getDisplayName()}">DISPLAY_NAME</td>
-            <td th:text="${product.getPrice()}">PRICE</td>
-            <td><button type="button" th:data-id="${product.getProductUUID()}" th:onclick="|removeProductFromCart(this.getAttribute('data-id'))|">Remove from cart</button></td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-<div th:if="${productsInCart.size() > 0}">
-    <h2>Checkout</h2>
-    <!--/*@thymesVar id="CheckoutModel" type="com.prg2025ta.project.examinationpgr2025ta.api.models.CheckoutModel"*/-->
-    <form action="#" th:action="@{/cart/checkout}" th:object="${CheckoutModel}" method="post" onsubmit="return checkout();" id="checkoutForm">
-        <label for="customerIdInput">Customer ID:</label>
-        <input id="customerIdInput" type="number" name="customerId">
+<header>
+    <a href="/">Employee Page</a>
+</header>
+
+<div class="container">
+    <h1>Shopping Cart</h1>
+    
+    <div class="total">
+        Total: €<span th:text="${total}">0.00</span>
+    </div>
+
+    <div th:if="${#lists.size(products) > 0}">
+        <h2>Available Products</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="product: ${products}">
+                <td th:text="${product.getDisplayName()}">DISPLAY_NAME</td>
+                <td th:text="'€' + ${product.getPrice()}">PRICE</td>
+                <td>
+                    <button class="btn-small" th:data-id="${product.getProductUUID()}" th:onclick="|addProductToCart(this.getAttribute('data-id'))|">
+                    Add
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:if="${#lists.size(products) <= 0}">
+        <div class="error-message">
+            No products available at the moment. Please check back later!
+        </div>
+    </div>
+
+    <div>
+        <h2>Your Cart</h2>
+        <div th:if="${productsInCart.size() > 0}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="product: ${productsInCart}">
+                    <td th:text="${product.getDisplayName()}">DISPLAY_NAME</td>
+                    <td th:text="'€' + ${product.getPrice()}">PRICE</td>
+                    <td>
+                        <button type="button" class="btn-danger btn-small" th:data-id="${product.getProductUUID()}" th:onclick="|removeProductFromCart(this.getAttribute('data-id'))|">
+                        Remove
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${productsInCart.size() <= 0}">
+            <p class="info-box">Your cart is empty.</p>
+        </div>
+    </div>
+
+    <div th:if="${productsInCart.size() > 0}">
+        <h2>Checkout</h2>
+        
+        <form action="#" th:action="@{/cart/checkout}" th:object="${CheckoutModel}" method="post" onsubmit="return checkout();" id="checkoutForm">
+            <label for="customerIdInput">Customer ID:</label>
+            <input id="customerIdInput" type="number" name="customerId" required placeholder="Enter your customer ID">
 
         <label for="paymentMethodInput">Payment Method:</label>
         <input type="text" id="paymentMethodInput" name="paymentMethod">
 
-        <input type="submit" value="Pay">
-    </form>
+            <input type="submit" value="Proceed to Payment">
+        </form>
+    </div>
 </div>
 </body>
 </html>

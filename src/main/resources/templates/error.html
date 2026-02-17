@@ -2,11 +2,63 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Uh oh!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oh no!. Something's broken.</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            text-align: center;
+        }
+
+        .error-container h1 {
+            font-size: 3rem;
+            color: #d32f2f;
+            margin-bottom: 1rem;
+        }
+
+        .error-container p {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 2rem;
+            max-width: 600px;
+        }
+
+        .error-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+        }
+
+        .error-container a {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 4px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .error-container a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            text-decoration: none;
+        }
+    </style>
 </head>
 <body>
-<h1>It looks like something reeeeally bad just happend</h1>
-<a href="/">Go Home</a>
+<header>
+    <a href="/">← Home</a>
+</header>
+
+<div class="container error-container">
+    <h1>Uh oh!</h1>
+    <p>It looks like something reeeally bad happened. .</p>
+    <a href="/">Go Home</a>
+</div>
 </body>
 </html>
