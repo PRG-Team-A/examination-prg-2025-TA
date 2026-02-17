@@ -59,6 +59,7 @@ public class SessionCart {
     }
 
     public SalesClass getSale() {
+        sale.setTotal(getTotal());
         return sale;
     }
 }

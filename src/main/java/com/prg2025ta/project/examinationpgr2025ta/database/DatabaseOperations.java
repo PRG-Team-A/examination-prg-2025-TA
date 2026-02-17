@@ -157,8 +157,9 @@ public class DatabaseOperations {
                 .prepareStatement("SELECT max(sale_id) FROM sales;");
 
         int highestSaleId = getHighestSaleId.executeQuery().getInt(1);
+        int saleId = highestSaleId + 1;
 
-        insertSaleStatement.setInt(1, highestSaleId + 1);
+        insertSaleStatement.setInt(1, saleId);
         insertSaleStatement.setInt(2, sale.getCustomerID());
         insertSaleStatement.setString(3, sale.getPaymentMethod());
         insertSaleStatement.setDouble(4, sale.getTotal());
@@ -171,7 +172,7 @@ public class DatabaseOperations {
             return false;
         }
 
-        insertProductStatement.setInt(1, sale.getSaleId());
+        insertProductStatement.setInt(1, saleId);
 
         for (Product productBought : sale.getProductsBought()) {
             UUID productUUID = productBought.getUuid();
@@ -212,10 +213,13 @@ public class DatabaseOperations {
         PreparedStatement statement = dbConnection
                 .prepareStatement("SELECT product_id FROM sales_products WHERE sale_id = ?;");
 
+        statement.setInt(1, saleId);
+
         ResultSet resultSet = statement.executeQuery();
         while (resultSet.next()) {
             String productUUID = resultSet.getString("product_id");
-            products.add(getProductByUUID(UUID.fromString(productUUID)));
+            Product product = getProductByUUID(UUID.fromString(productUUID));
+            products.add(product);
         }
 
         return products;

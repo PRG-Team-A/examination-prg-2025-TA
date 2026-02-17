@@ -69,6 +69,7 @@ public class CheckoutController {
     @PostMapping("/cart/checkout")
     @ResponseBody
     public String checkout(@ModelAttribute CheckoutModel checkoutModel) throws SQLException {
+        // TODO: Sanitize & Verify user input
         sessionCart.setPaymentMethod(checkoutModel.getPaymentMethod());
         sessionCart.setCustomerId(Integer.parseInt(checkoutModel.getCustomerId()));
 
