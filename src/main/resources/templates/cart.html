@@ -99,10 +99,10 @@
     <!--/*@thymesVar id="CheckoutModel" type="com.prg2025ta.project.examinationpgr2025ta.api.models.CheckoutModel"*/-->
     <form action="#" th:action="@{/cart/checkout}" th:object="${CheckoutModel}" method="post" onsubmit="return checkout();" id="checkoutForm">
         <label for="customerIdInput">Customer ID:</label>
-        <input id="customerIdInput" type="number" name="customerId">
+        <input id="customerIdInput" type="number" name="customerId" required>
 
         <label for="paymentMethodInput">Payment Method:</label>
-        <input type="text" id="paymentMethodInput" name="paymentMethod">
+        <input type="text" id="paymentMethodInput" name="paymentMethod" required>
 
         <input type="submit" value="Pay">
     </form>
