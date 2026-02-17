@@ -4,9 +4,11 @@ import com.prg2025ta.project.examinationpgr2025ta.api.models.ProductModel;
 import com.prg2025ta.project.examinationpgr2025ta.database.DatabaseOperations;
 import com.prg2025ta.project.examinationpgr2025ta.products.GroceryProduct;
 import com.prg2025ta.project.examinationpgr2025ta.products.Product;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -52,6 +54,16 @@ public class ProductController {
         Product product = new GroceryProduct(productModel.getDisplayName(), productModel.getPrice());
         ApiApplication.warehouse.acceptDelivery(product);
         return new RedirectView("/");
+    }
+
+    @GetMapping("/remove/{productUUID}")
+    @ResponseBody
+    public String removeProduct(@PathVariable String productUUID) {
+        Product product = ApiApplication.warehouse.getProductWithUuid(productUUID);
+        if (product == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        ApiApplication.warehouse.removeFromWarehouse(product);
+
+        return "";
     }
 
     @GetMapping("/save")

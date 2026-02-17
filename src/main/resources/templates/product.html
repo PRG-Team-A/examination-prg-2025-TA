@@ -7,7 +7,16 @@
 
     <script>
         function saveProducts() {
-            fetch("/save");
+            fetch("product/save").then(response => {
+                if (response.ok) alert("Successfully stored.");
+                else alert("There was an error");
+            });
+        }
+
+        function removeProduct(productUUID) {
+            fetch(`product/remove/${productUUID}`).then(response => {
+                if (response.ok) location.reload();
+            })
         }
     </script>
 </head>
@@ -40,6 +49,7 @@
         <tr th:each="product: ${products}">
             <td th:text="${product.getDisplayName()}">DISPLAY_NAME</td>
             <td th:text="${product.getPrice()}">PRICE</td>
+            <td><button th:data-id="${product.getProductUUID()}" th:onclick="|removeProduct(this.getAttribute('data-id'))|">Remove Product</button></td>
         </tr>
         </tbody>
     </table>
