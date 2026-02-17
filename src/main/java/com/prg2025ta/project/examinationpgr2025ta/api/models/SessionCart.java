@@ -62,4 +62,9 @@ public class SessionCart {
         sale.setTotal(getTotal());
         return sale;
     }
+
+    public void resetCart() {
+        hasBeenInitialized = false;
+        initialize();
+    }
 }

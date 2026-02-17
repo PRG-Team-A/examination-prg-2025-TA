@@ -78,6 +78,8 @@ public class CheckoutController {
         log.info("Inserting sale");
         databaseOperations.insertSale(sale);
 
+        sessionCart.resetCart();
+
         return "";
     }
 }
