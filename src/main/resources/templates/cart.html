@@ -66,7 +66,7 @@
         <tbody>
         <tr th:each="product: ${products}">
             <td th:text="${product.getDisplayName()}">DISPLAY_NAME</td>
-            <td th:text="${product.getPrice()}">PRICE</td>
+            <td th:text="${product.getPrice() + ' €'}">PRICE</td>
             <td><button
                     th:data-id="${product.getProductUUID()}" th:onclick="|addProductToCart(this.getAttribute('data-id'))|">Add to cart</button></td>
         </tr>
