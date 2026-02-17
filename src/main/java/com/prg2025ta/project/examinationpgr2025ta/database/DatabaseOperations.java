@@ -141,7 +141,7 @@ public class DatabaseOperations {
     /**
      * This method does not alter the database if any operation fails. (I hope)
      * @param sale The sale to be inserted into the database
-     * @return true, if this sale has been inserted sucessfully, false if it failed.
+     * @return true, if this sale has been inserted successfully, false if it failed.
      */
     public boolean insertSale(SalesClass sale) throws SQLException {
         dbConnection.setAutoCommit(false);
