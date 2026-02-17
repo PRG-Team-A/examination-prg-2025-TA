@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta charset="UTF-8" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" 
+    content="width=device-width, initial-scale=1.0">
     <title>Product Management</title>
     <link rel="stylesheet" href="/style.css">
 
@@ -30,7 +30,7 @@
     <h1>Products</h1>
 
     <div class="info-box">
-        <p>Welcome to the product management page. Here you can add new products to the warehouse and manage existing inventory.</p>
+        <p>Product Wharehouse Inventory.</p>
     </div>
 
     <div>
@@ -40,14 +40,14 @@
             <input id="displayNameInput" type="text" name="displayName" required placeholder="Enter product name">
 
             <label for="priceInput">Price (€):</label>
-            <input type="number" name="price" id="priceInput" step=".01" min="0" required placeholder="0.00">
+            <input type="number" name="price" id="priceInput" step=".01">
 
             <input type="submit" value="Add Product">
         </form>
     </div>
 
     <div>
-        <h2>Products in Warehouse</h2>
+        <h2>Products in Warehouse.</h2>
         <table>
             <thead>
             <tr>
