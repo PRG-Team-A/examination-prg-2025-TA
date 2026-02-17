@@ -49,7 +49,7 @@ public class ProductController {
         return "product";
     }
 
-    @PostMapping("/product")
+    @PostMapping("/new")
     public RedirectView product(@ModelAttribute ProductModel productModel) {
         Product product = new GroceryProduct(productModel.getDisplayName(), productModel.getPrice());
         ApiApplication.warehouse.acceptDelivery(product);
