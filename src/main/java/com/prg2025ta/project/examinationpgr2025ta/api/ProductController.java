@@ -6,10 +6,7 @@ import com.prg2025ta.project.examinationpgr2025ta.products.GroceryProduct;
 import com.prg2025ta.project.examinationpgr2025ta.products.Product;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -22,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
+@RequestMapping("/product")
 public class ProductController {
     private static final Logger log = LoggerFactory.getLogger(ProductController.class);
 
@@ -35,7 +33,7 @@ public class ProductController {
         return productModelList;
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     public String person(Model model) {
         // FIXME: This is only a proof-of-concept implementation and should be changed to include "real" implementation
 
@@ -56,7 +54,7 @@ public class ProductController {
         return new RedirectView("/");
     }
 
-    @GetMapping("/product/save")
+    @GetMapping("/save")
     @ResponseBody
     public String saveProductsToDB() throws SQLException {
         Map<Product, Integer> productsInStock = ApiApplication.warehouse.getProductsInStock();

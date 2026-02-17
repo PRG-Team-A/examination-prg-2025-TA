@@ -12,6 +12,7 @@ module com.prg2025ta.project.examinationpgr2025ta {
     requires java.sql;
     requires org.jetbrains.annotations;
     requires org.slf4j;
+    requires org.apache.logging.log4j;
 
     exports com.prg2025ta.project.examinationpgr2025ta.products;
     exports com.prg2025ta.project.examinationpgr2025ta.exceptions;

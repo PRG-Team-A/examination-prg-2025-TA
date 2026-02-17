@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sales</title>
+
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<a href="/">Home</a>
+<h1>Sales overview</h1>
+<table>
+    <thead>
+    <tr>
+        <td>Sale Id</td>
+        <td>Customer id</td>
+        <td>Amount of products bought</td>
+        <td>Payment method</td>
+        <td>Total</td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="sale: ${sales}">
+        <td th:text="${sale.getSaleId()}">SALE_ID</td>
+        <td th:text="${sale.getCustomerID()}">CUSTOMER_ID</td>
+        <td th:text="${sale.getProductsBought().size()}">PRODUCTS_BOUGHT</td>
+        <td th:text="${sale.getPaymentMethod()}">PAYMENT_METHOD</td>
+        <td th:text="${sale.getTotal()}">TOTAL</td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

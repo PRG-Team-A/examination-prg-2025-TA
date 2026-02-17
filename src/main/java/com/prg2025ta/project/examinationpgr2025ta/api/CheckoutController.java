@@ -1,15 +1,20 @@
 package com.prg2025ta.project.examinationpgr2025ta.api;
 
+import com.prg2025ta.project.examinationpgr2025ta.SalesClass;
 import com.prg2025ta.project.examinationpgr2025ta.api.models.CheckoutModel;
 import com.prg2025ta.project.examinationpgr2025ta.api.models.ProductModel;
 import com.prg2025ta.project.examinationpgr2025ta.api.models.SessionCart;
+import com.prg2025ta.project.examinationpgr2025ta.database.DatabaseOperations;
 import com.prg2025ta.project.examinationpgr2025ta.products.Product;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.HtmlUtils;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +22,7 @@ import static com.prg2025ta.project.examinationpgr2025ta.api.ProductController.g
 
 @Controller
 public class CheckoutController {
+    private static final Logger log = LogManager.getLogger(CheckoutController.class);
     private final SessionCart sessionCart;
 
     @Autowired
@@ -62,9 +68,14 @@ public class CheckoutController {
 
     @PostMapping("/cart/checkout")
     @ResponseBody
-    public String checkout(@ModelAttribute CheckoutModel checkoutModel) {
+    public String checkout(@ModelAttribute CheckoutModel checkoutModel) throws SQLException {
         sessionCart.setPaymentMethod(checkoutModel.getPaymentMethod());
         sessionCart.setCustomerId(Integer.parseInt(checkoutModel.getCustomerId()));
+
+        SalesClass sale = sessionCart.getSale();
+        DatabaseOperations databaseOperations = DatabaseOperations.getInstance();
+        log.info("Inserting sale");
+        databaseOperations.insertSale(sale);
 
         return "";
     }

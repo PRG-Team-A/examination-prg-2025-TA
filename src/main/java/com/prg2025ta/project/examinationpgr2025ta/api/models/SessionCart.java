@@ -57,4 +57,8 @@ public class SessionCart {
     public List<Product> getProductsBought() {
         return this.sale.getProductsBought();
     }
+
+    public SalesClass getSale() {
+        return sale;
+    }
 }
