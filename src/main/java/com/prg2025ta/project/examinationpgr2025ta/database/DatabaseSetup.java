@@ -7,7 +7,17 @@ import java.sql.Statement;
 
 public class DatabaseSetup {
     private static final String[] sql_to_execute = new String[] {
-            "CREATE TABLE IF NOT EXISTS products (product_uuid TEXT PRIMARY KEY, display_name TEXT NOT NULL, price NUMBER NOT NULL);",
+            """
+CREATE TABLE IF NOT EXISTS products (
+    product_uuid TEXT PRIMARY KEY,
+    display_name TEXT NOT NULL,
+    price NUMBER NOT NULL,
+    product_type TEXT DEFAULT 'grocery',
+    needs_cooling INTEGER DEFAULT 0,
+    expiry_date INTEGER DEFAULT 0,
+    tax_category TEXT DEFAULT 'STANDARD',
+    is_premium INTEGER DEFAULT 0
+);""",
     };
 
     public static void setup() throws SQLException {
