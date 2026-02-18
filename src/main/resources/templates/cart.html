@@ -55,7 +55,7 @@
 </style>
 <body>
 <header>
-    <a href="/">Employee Page</a>
+    <a href="/sales">Sales Page</a>
 </header>
 
 <div class="container">
@@ -91,7 +91,7 @@
 
     <div th:if="${#lists.size(products) <= 0}">
         <div class="error-message">
-            No products available at the moment. Please check back later!
+            The Shopping Cart is Empty.
         </div>
     </div>
 
@@ -131,6 +131,56 @@
         <form action="#" th:action="@{/cart/checkout}" th:object="${CheckoutModel}" method="post" onsubmit="return checkout();" id="checkoutForm">
             <label for="customerIdInput">Customer ID:</label>
             <input id="customerIdInput" type="number" name="customerId" required placeholder="Enter your customer ID">
+
+<a href="/sales">Employee site</a>
+<h1>Cart</h1>
+<span>Total: <span th:text="${total}">TOTAL</span> €</span>
+<div th:if="${#lists.size(products) > 0}">
+    <h2>Available Products</h2>
+    <table>
+        <thead>
+        <tr>
+            <td>Product</td>
+            <td>Price</td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="product: ${products}">
+            <td th:text="${product.getDisplayName()}">DISPLAY_NAME</td>
+            <td th:text="${product.getPrice() + ' €'}">PRICE</td>
+            <td><button
+                    th:data-id="${product.getProductUUID()}" th:onclick="|addProductToCart(this.getAttribute('data-id'))|">Add to cart</button></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div th:if="${#lists.size(products) <= 0}">
+    <h2 class="error-message">There are currently no products available to buy! Sorry :|</h2>
+</div>
+<div>
+    <h2>Products in cart</h2>
+    <table>
+        <thead>
+        <tr>
+            <td>Product</td>
+            <td>Price</td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="product: ${productsInCart}">
+            <td th:text="${product.getDisplayName()}">DISPLAY_NAME</td>
+            <td th:text="${product.getPrice()}">PRICE</td>
+            <td><button type="button" th:data-id="${product.getProductUUID()}" th:onclick="|removeProductFromCart(this.getAttribute('data-id'))|">Remove from cart</button></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div th:if="${productsInCart.size() > 0}">
+    <h2>Checkout</h2>
+    
+    <form action="#" th:action="@{/cart/checkout}" th:object="${CheckoutModel}" method="post" onsubmit="return checkout();" id="checkoutForm">
+        <label for="customerIdInput">Customer ID:</label>
+        <input id="customerIdInput" type="number" name="customerId" required>
 
         <label for="paymentMethodInput">Payment Method:</label>
         <input type="text" id="paymentMethodInput" name="paymentMethod">
