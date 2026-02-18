@@ -6,18 +6,39 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DatabaseSetup {
+
     private static final String[] sql_to_execute = new String[] {
-            """
-CREATE TABLE IF NOT EXISTS products (
-    product_uuid TEXT PRIMARY KEY,
-    display_name TEXT NOT NULL,
-    price NUMBER NOT NULL,
-    product_type TEXT DEFAULT 'grocery',
-    needs_cooling INTEGER DEFAULT 0,
-    expiry_date INTEGER DEFAULT 0,
-    tax_category TEXT DEFAULT 'STANDARD',
-    is_premium INTEGER DEFAULT 0
-);""",
+            "CREATE TABLE IF NOT EXISTS \"products\"\n" +
+                    "(\n" +
+                    "    product_uuid  TEXT\n" +
+                    "        primary key,\n" +
+                    "    display_name  TEXT not null,\n" +
+                    "    price         NUMBER,\n" +
+                    "    product_type  TEXT DEFAULT 'grocery',\n" +
+                    "    needs_cooling INTEGER,\n" +
+                    "    expiry_date   INTEGER,\n" +
+                    "    tax_category  TEXT DEFAULT 'STANDARD',\n" +
+                    "    is_premium    INTEGER DEFAULT 0\n" +
+                    ");",
+            "CREATE TABLE IF NOT EXISTS warehouse\n" +
+                    "(\n" +
+                    "    warehouse_id integer not null\n" +
+                    "        constraint warehouse_pk\n" +
+                    "            primary key autoincrement,\n" +
+                    "    name         TEXT\n" +
+                    ");",
+            "CREATE TABLE IF NOT EXISTS sales\n" +
+                    "(\n" +
+                    "    sale_id integer primary key,\n" +
+                    "    customerId integer,\n" +
+                    "    paymentMethod TEXT,\n" +
+                    "    total REAL\n" +
+                    ");",
+            "CREATE TABLE IF NOT EXISTS sales_products\n" +
+                    "(\n" +
+                    "    sale_id integer NOT NULL,\n" +
+                    "    product_id TEXT NOT NULL\n" +
+                    ");"
     };
 
     public static void setup() throws SQLException {
