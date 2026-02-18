@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class DatabaseSetup {
-
     private static final String[] sql_to_execute = new String[] {
             "CREATE TABLE IF NOT EXISTS \"products\"\n" +
                     "(\n" +
