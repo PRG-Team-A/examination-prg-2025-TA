@@ -5,12 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class DatabaseSetup {
-    // CHANGED: Enhanced products table to support ALL product types:
-    // - GroceryProduct: needs_cooling, expiry_date
-    // - NonGroceryProduct: tax_category, is_premium
-    // - ElectronicProduct: warranty_years (extends NonGroceryProduct)
-    // - WeightBasedProduct: price_per_kg (no regular price)
-    // PR #34 compatible: Includes warehouse, sales, sales_products tables
+
     private static final String[] sql_to_execute = new String[] {
             "CREATE TABLE IF NOT EXISTS \"products\"\n" +
                     "(\n" +
