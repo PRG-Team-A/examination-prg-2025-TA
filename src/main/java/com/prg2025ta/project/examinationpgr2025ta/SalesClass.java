@@ -51,6 +51,7 @@ public class SalesClass {
         this(-1, customerID, paymentMethod, productsBought, total);
     }
     public SalesClass(int saleId, int customerID, String paymentMethod, List<Product> productsBought, double total) {
+        this.saleId = saleId;
         this.customerID = customerID;
         this.paymentMethod = paymentMethod;
         this.productsBought = productsBought;

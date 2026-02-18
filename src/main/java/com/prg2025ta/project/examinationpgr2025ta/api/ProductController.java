@@ -4,12 +4,11 @@ import com.prg2025ta.project.examinationpgr2025ta.api.models.ProductModel;
 import com.prg2025ta.project.examinationpgr2025ta.database.DatabaseOperations;
 import com.prg2025ta.project.examinationpgr2025ta.products.GroceryProduct;
 import com.prg2025ta.project.examinationpgr2025ta.products.Product;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -22,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
+@RequestMapping("/product")
 public class ProductController {
     private static final Logger log = LoggerFactory.getLogger(ProductController.class);
 
@@ -35,7 +35,7 @@ public class ProductController {
         return productModelList;
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     public String person(Model model) {
         // FIXME: This is only a proof-of-concept implementation and should be changed to include "real" implementation
 
@@ -49,14 +49,24 @@ public class ProductController {
         return "product";
     }
 
-    @PostMapping("/product")
+    @PostMapping("/new")
     public RedirectView product(@ModelAttribute ProductModel productModel) {
         Product product = new GroceryProduct(productModel.getDisplayName(), productModel.getPrice());
         ApiApplication.warehouse.acceptDelivery(product);
         return new RedirectView("/");
     }
 
-    @GetMapping("/product/save")
+    @GetMapping("/remove/{productUUID}")
+    @ResponseBody
+    public String removeProduct(@PathVariable String productUUID) {
+        Product product = ApiApplication.warehouse.getProductWithUuid(productUUID);
+        if (product == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        ApiApplication.warehouse.removeFromWarehouse(product);
+
+        return "";
+    }
+
+    @GetMapping("/save")
     @ResponseBody
     public String saveProductsToDB() throws SQLException {
         Map<Product, Integer> productsInStock = ApiApplication.warehouse.getProductsInStock();

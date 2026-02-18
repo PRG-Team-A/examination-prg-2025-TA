@@ -1,22 +1,31 @@
 package com.prg2025ta.project.examinationpgr2025ta.api;
 
+import com.prg2025ta.project.examinationpgr2025ta.SalesClass;
 import com.prg2025ta.project.examinationpgr2025ta.api.models.CheckoutModel;
 import com.prg2025ta.project.examinationpgr2025ta.api.models.ProductModel;
 import com.prg2025ta.project.examinationpgr2025ta.api.models.SessionCart;
+import com.prg2025ta.project.examinationpgr2025ta.database.DatabaseOperations;
 import com.prg2025ta.project.examinationpgr2025ta.products.Product;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.HtmlUtils;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
 import static com.prg2025ta.project.examinationpgr2025ta.api.ProductController.getProductsAsModel;
 
 @Controller
+@RequestMapping("/cart")
 public class CheckoutController {
+    private static final Logger log = LogManager.getLogger(CheckoutController.class);
     private final SessionCart sessionCart;
 
     @Autowired
@@ -24,7 +33,7 @@ public class CheckoutController {
         this.sessionCart = sessionCart;
     }
 
-    @GetMapping("/cart")
+    @GetMapping("")
     public String cart(Model model) {
         sessionCart.initialize();
 
@@ -39,32 +48,47 @@ public class CheckoutController {
         return "cart";
     }
 
-    @PostMapping("/cart/add/{productUUID}")
+    @PostMapping("/add/{productUUID}")
     @ResponseBody
     public String addProductToCart(@PathVariable String productUUID) {
         sessionCart.addProductToCart(ApiApplication.warehouse.getProductWithUuid(productUUID));
         return "ID: " + HtmlUtils.htmlEscape(productUUID);
     }
 
-    @PostMapping("/cart/remove/{productUUID}")
+    @PostMapping("/remove/{productUUID}")
     @ResponseBody
     public String removeProductFromCart(@PathVariable String productUUID) {
         sessionCart.removeProductFromCart(productUUID);
         return "ID: " + HtmlUtils.htmlEscape(productUUID);
     }
 
-    @PostMapping("/cart/payment/method/{paymentMethod}")
+    @PostMapping("/payment/method/{paymentMethod}")
     @ResponseBody
     public String setPaymentMethod(@PathVariable String paymentMethod) {
         sessionCart.setPaymentMethod(paymentMethod);
         return "Method: " + HtmlUtils.htmlEscape(paymentMethod);
     }
 
-    @PostMapping("/cart/checkout")
+    @PostMapping("/checkout")
     @ResponseBody
-    public String checkout(@ModelAttribute CheckoutModel checkoutModel) {
+    public String checkout(@ModelAttribute CheckoutModel checkoutModel) throws SQLException {
+        // TODO: Sanitize & Verify user input
+        String paymentMethod = checkoutModel.getPaymentMethod();
+        String customerId = checkoutModel.getCustomerId();
+
+        if (customerId.isBlank() || paymentMethod.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
         sessionCart.setPaymentMethod(checkoutModel.getPaymentMethod());
         sessionCart.setCustomerId(Integer.parseInt(checkoutModel.getCustomerId()));
+
+        SalesClass sale = sessionCart.getSale();
+        DatabaseOperations databaseOperations = DatabaseOperations.getInstance();
+        log.info("Inserting sale");
+        databaseOperations.insertSale(sale);
+
+        sessionCart.resetCart();
 
         return "";
     }

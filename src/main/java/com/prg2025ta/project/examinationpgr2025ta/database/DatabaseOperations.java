@@ -3,18 +3,19 @@ package com.prg2025ta.project.examinationpgr2025ta.database;
 import com.prg2025ta.project.examinationpgr2025ta.SalesClass;
 import com.prg2025ta.project.examinationpgr2025ta.products.GroceryProduct;
 import com.prg2025ta.project.examinationpgr2025ta.products.Product;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 public class DatabaseOperations {
+    private static final Logger log = LogManager.getLogger(DatabaseOperations.class);
     private Connection dbConnection;
 
     private static DatabaseOperations INSTANCE;
@@ -135,6 +136,91 @@ public class DatabaseOperations {
         dbConnection.commit();
 
         System.out.println("Deleted " + result.length + " products.");
+    }
+
+    /**
+     * This method does not alter the database if any operation fails. (I hope)
+     * @param sale The sale to be inserted into the database
+     * @return true, if this sale has been inserted successfully, false if it failed.
+     */
+    public boolean insertSale(SalesClass sale) throws SQLException {
+        dbConnection.setAutoCommit(false);
+        PreparedStatement insertSaleStatement = dbConnection
+                .prepareStatement("INSERT INTO sales (sale_id, customerId, paymentMethod, total) VALUES (?, ?, ?, ?)");
+
+        PreparedStatement insertProductStatement = dbConnection
+                .prepareStatement("INSERT INTO sales_products (sale_id, product_id) VALUES (?, ?)");
+
+        PreparedStatement getHighestSaleId = dbConnection
+                .prepareStatement("SELECT max(sale_id) FROM sales;");
+
+        int highestSaleId = getHighestSaleId.executeQuery().getInt(1);
+        int saleId = highestSaleId + 1;
+
+        insertSaleStatement.setInt(1, saleId);
+        insertSaleStatement.setInt(2, sale.getCustomerID());
+        insertSaleStatement.setString(3, sale.getPaymentMethod());
+        insertSaleStatement.setDouble(4, sale.getTotal());
+
+        int rowCount = insertSaleStatement.executeUpdate();
+
+        if (rowCount != 1) {
+            log.warn("Error with database operation");
+            dbConnection.rollback();
+            return false;
+        }
+
+        insertProductStatement.setInt(1, saleId);
+
+        for (Product productBought : sale.getProductsBought()) {
+            UUID productUUID = productBought.getUuid();
+            insertProductStatement.setString(2, productUUID.toString());
+            insertProductStatement.addBatch();
+        }
+        insertProductStatement.executeBatch();
+
+        dbConnection.commit();
+        dbConnection.setAutoCommit(true);
+        return true;
+    }
+
+    public List<SalesClass> getAllSales() throws SQLException {
+        List<SalesClass> sales = new ArrayList<>();
+
+        PreparedStatement selectSalesStatement = dbConnection
+                .prepareStatement("SELECT sale_id, customerId, paymentMethod, total FROM sales;");
+
+        ResultSet rs = selectSalesStatement.executeQuery();
+        while (rs.next()) {
+            int saleId = rs.getInt("sale_id");
+            int customerId = rs.getInt("customerId");
+            String paymentMethod = rs.getString("paymentMethod");
+            double total = rs.getDouble("total");
+
+            List<Product> products = getProductsFromSale(saleId);
+
+            sales.add(new SalesClass(saleId, customerId, paymentMethod, products, total));
+        }
+
+        return sales;
+    }
+
+    private List<Product> getProductsFromSale(int saleId) throws SQLException {
+        List<Product> products = new ArrayList<>();
+
+        PreparedStatement statement = dbConnection
+                .prepareStatement("SELECT product_id FROM sales_products WHERE sale_id = ?;");
+
+        statement.setInt(1, saleId);
+
+        ResultSet resultSet = statement.executeQuery();
+        while (resultSet.next()) {
+            String productUUID = resultSet.getString("product_id");
+            Product product = getProductByUUID(UUID.fromString(productUUID));
+            products.add(product);
+        }
+
+        return products;
     }
 
     /**

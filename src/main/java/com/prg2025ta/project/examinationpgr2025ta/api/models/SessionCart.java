@@ -57,4 +57,14 @@ public class SessionCart {
     public List<Product> getProductsBought() {
         return this.sale.getProductsBought();
     }
+
+    public SalesClass getSale() {
+        sale.setTotal(getTotal());
+        return sale;
+    }
+
+    public void resetCart() {
+        hasBeenInitialized = false;
+        initialize();
+    }
 }

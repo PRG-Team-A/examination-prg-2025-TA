@@ -3,20 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <title>Product Creation</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/style.css">
 
     <script>
         function saveProducts() {
-            fetch("/product/save");
+            fetch("product/save").then(response => {
+                if (response.ok) alert("Successfully stored.");
+                else alert("There was an error");
+            });
+        }
+
+        function removeProduct(productUUID) {
+            fetch(`product/remove/${productUUID}`).then(response => {
+                if (response.ok) location.reload();
+            })
         }
     </script>
 </head>
 <body>
+<a href="/sales">Sales page</a>
 <h1>Product page</h1>
 <p>If you are not an employee, please don't do anything and just go to our <a href="/cart">page for customers</a></p>
 <div>
     <h2>New Product</h2>
-    <form action="#" th:action="@{/product}" th:object="${Product}" method="post">
+    <form action="#" th:action="@{/product/new}" th:object="${Product}" method="post">
         <label for="displayNameInput">Display Name:</label>
         <input id="displayNameInput" type="text" name="displayName">
 
@@ -39,6 +49,7 @@
         <tr th:each="product: ${products}">
             <td th:text="${product.getDisplayName()}">DISPLAY_NAME</td>
             <td th:text="${product.getPrice()}">PRICE</td>
+            <td><button th:data-id="${product.getProductUUID()}" th:onclick="|removeProduct(this.getAttribute('data-id'))|">Remove Product</button></td>
         </tr>
         </tbody>
     </table>
