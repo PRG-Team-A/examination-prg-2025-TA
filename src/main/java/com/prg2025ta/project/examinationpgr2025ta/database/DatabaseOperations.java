@@ -110,7 +110,7 @@ public class DatabaseOperations {
     private void insertWeightBasedProduct(PreparedStatement prepared, WeightBasedProduct wbp) throws SQLException {
         prepared.setString(2, "weight_based");
         prepared.setString(3, wbp.getDisplayName());
-        prepared.setNull(4, Types.NUMERIC);
+        prepared.setDouble(4, 0.0);
         prepared.setDouble(5, wbp.getPricePerKg());
         prepared.setInt(6, 0);
         prepared.setLong(7, 0);
@@ -131,46 +131,49 @@ public class DatabaseOperations {
         prepared.setInt(10, 0);
     }
 
+    // FIX #1: Wrapped PreparedStatement and ResultSet in try-with-resources
     public Product getProductByUUID(UUID uuid) throws SQLException {
-        PreparedStatement statement = dbConnection
-                .prepareStatement("SELECT product_uuid, product_type, display_name, price, price_per_kg, needs_cooling, expiry_date, tax_category, is_premium, warranty_years FROM products WHERE product_uuid = ?");
+        try (PreparedStatement statement = dbConnection
+                .prepareStatement("SELECT product_uuid, product_type, display_name, price, price_per_kg, needs_cooling, expiry_date, tax_category, is_premium, warranty_years FROM products WHERE product_uuid = ?")) {
 
-        statement.setString(1, uuid.toString());
-        ResultSet resultSet = statement.executeQuery();
+            statement.setString(1, uuid.toString());
 
-        if (!resultSet.next()) {
-            return null;
-        }
-
-        String product_id = resultSet.getString("product_uuid");
-        String product_type = resultSet.getString("product_type");
-        String display_name = resultSet.getString("display_name");
-        double price = resultSet.getDouble("price");
-        double price_per_kg = resultSet.getDouble("price_per_kg");
-        int needsCooling = resultSet.getInt("needs_cooling");
-        long expiry_date = resultSet.getLong("expiry_date");
-        String tax_category = resultSet.getString("tax_category");
-        int is_premium = resultSet.getInt("is_premium");
-        int warranty_years = resultSet.getInt("warranty_years");
-
-        if (product_id == null || display_name == null) {
-            return null;
-        }
-
-        try {
-            return switch (product_type) {
-                case "grocery" -> deserializeGroceryProduct(product_id, display_name, price, needsCooling, expiry_date);
-                case "electronic" -> deserializeElectronicProduct(product_id, display_name, price, tax_category, is_premium, warranty_years);
-                case "non_grocery" -> deserializeNonGroceryProduct(product_id, display_name, price, tax_category, is_premium);
-                case "weight_based" -> deserializeWeightBasedProduct(product_id, display_name, price_per_kg);
-                default -> {
-                    log.warn("Unknown product type: " + product_type);
-                    yield null;
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (!resultSet.next()) {
+                    return null;
                 }
-            };
-        } catch (IllegalArgumentException e) {
-            log.error("Error deserializing product with UUID: " + product_id, e);
-            return null;
+
+                String product_id = resultSet.getString("product_uuid");
+                String product_type = resultSet.getString("product_type");
+                String display_name = resultSet.getString("display_name");
+                double price = resultSet.getDouble("price");
+                double price_per_kg = resultSet.getDouble("price_per_kg");
+                int needsCooling = resultSet.getInt("needs_cooling");
+                long expiry_date = resultSet.getLong("expiry_date");
+                String tax_category = resultSet.getString("tax_category");
+                int is_premium = resultSet.getInt("is_premium");
+                int warranty_years = resultSet.getInt("warranty_years");
+
+                if (product_id == null || display_name == null) {
+                    return null;
+                }
+
+                try {
+                    return switch (product_type) {
+                        case "grocery" -> deserializeGroceryProduct(product_id, display_name, price, needsCooling, expiry_date);
+                        case "electronic" -> deserializeElectronicProduct(product_id, display_name, price, tax_category, is_premium, warranty_years);
+                        case "non_grocery" -> deserializeNonGroceryProduct(product_id, display_name, price, tax_category, is_premium);
+                        case "weight_based" -> deserializeWeightBasedProduct(product_id, display_name, price_per_kg);
+                        default -> {
+                            log.warn("Unknown product type: " + product_type);
+                            yield null;
+                        }
+                    };
+                } catch (IllegalArgumentException e) {
+                    log.error("Error deserializing product with UUID: " + product_id, e);
+                    return null;
+                }
+            }
         }
     }
 
@@ -224,131 +227,146 @@ public class DatabaseOperations {
     public List<Product> getAllProducts() throws SQLException {
         List<Product> products = new ArrayList<>();
 
-        Statement statement = dbConnection.createStatement();
-        statement.execute("SELECT product_uuid, product_type, display_name, price, price_per_kg, needs_cooling, expiry_date, tax_category, is_premium, warranty_years FROM products;");
+        try (Statement statement = dbConnection.createStatement()) {
+            statement.execute("SELECT product_uuid, product_type, display_name, price, price_per_kg, needs_cooling, expiry_date, tax_category, is_premium, warranty_years FROM products;");
 
-        ResultSet resultSet = statement.getResultSet();
+            try (ResultSet resultSet = statement.getResultSet()) {
+                while (resultSet.next()) {
+                    String uuid = resultSet.getString("product_uuid");
+                    String product_type = resultSet.getString("product_type");
+                    String display_name = resultSet.getString("display_name");
+                    double price = resultSet.getDouble("price");
+                    double price_per_kg = resultSet.getDouble("price_per_kg");
+                    int needsCooling = resultSet.getInt("needs_cooling");
+                    long expiry_date = resultSet.getLong("expiry_date");
+                    String tax_category = resultSet.getString("tax_category");
+                    int is_premium = resultSet.getInt("is_premium");
+                    int warranty_years = resultSet.getInt("warranty_years");
 
-        while (resultSet.next()) {
-            String uuid = resultSet.getString("product_uuid");
-            String product_type = resultSet.getString("product_type");
-            String display_name = resultSet.getString("display_name");
-            double price = resultSet.getDouble("price");
-            double price_per_kg = resultSet.getDouble("price_per_kg");
-            int needsCooling = resultSet.getInt("needs_cooling");
-            long expiry_date = resultSet.getLong("expiry_date");
-            String tax_category = resultSet.getString("tax_category");
-            int is_premium = resultSet.getInt("is_premium");
-            int warranty_years = resultSet.getInt("warranty_years");
-
-            if (uuid == null || display_name == null) {
-                continue;
-            }
-
-            Product product = null;
-
-            try {
-                product = switch (product_type) {
-                    case "grocery" -> deserializeGroceryProduct(uuid, display_name, price, needsCooling, expiry_date);
-                    case "electronic" -> deserializeElectronicProduct(uuid, display_name, price, tax_category, is_premium, warranty_years);
-                    case "non_grocery" -> deserializeNonGroceryProduct(uuid, display_name, price, tax_category, is_premium);
-                    case "weight_based" -> deserializeWeightBasedProduct(uuid, display_name, price_per_kg);
-                    default -> {
-                        if (needsCooling != 0 || expiry_date != 0) {
-                            yield deserializeGroceryProduct(uuid, display_name, price, needsCooling, expiry_date);
-                        }
-                        yield null;
+                    if (uuid == null || display_name == null) {
+                        continue;
                     }
-                };
-            } catch (IllegalArgumentException e) {
-                log.error("Error deserializing product with UUID: " + uuid, e);
-                continue;
-            }
 
-            if (product != null) {
-                products.add(product);
+                    Product product = null;
+
+                    try {
+                        product = switch (product_type) {
+                            case "grocery" -> deserializeGroceryProduct(uuid, display_name, price, needsCooling, expiry_date);
+                            case "electronic" -> deserializeElectronicProduct(uuid, display_name, price, tax_category, is_premium, warranty_years);
+                            case "non_grocery" -> deserializeNonGroceryProduct(uuid, display_name, price, tax_category, is_premium);
+                            case "weight_based" -> deserializeWeightBasedProduct(uuid, display_name, price_per_kg);
+                            // FIX #4: Consistent with getProductByUUID() — log and yield null
+                            default -> {
+                                log.warn("Unknown product type in getAllProducts: " + product_type + " for UUID: " + uuid);
+                                yield null;
+                            }
+                        };
+                    } catch (IllegalArgumentException e) {
+                        log.error("Error deserializing product with UUID: " + uuid, e);
+                        continue;
+                    }
+
+                    if (product != null) {
+                        products.add(product);
+                    }
+                }
             }
         }
 
         return products;
     }
 
+
     public void deleteProducts(List<UUID> uuids) throws SQLException {
-        PreparedStatement statement = dbConnection
-                .prepareStatement("DELETE FROM products WHERE product_uuid = ?");
-
         dbConnection.setAutoCommit(false);
+        try (PreparedStatement statement = dbConnection
+                .prepareStatement("DELETE FROM products WHERE product_uuid = ?")) {
 
-        for (UUID uuid : uuids) {
-            statement.setString(1, uuid.toString());
-            statement.addBatch();
+            for (UUID uuid : uuids) {
+                statement.setString(1, uuid.toString());
+                statement.addBatch();
+            }
+
+            int[] result = statement.executeBatch();
+            dbConnection.commit();
+            dbConnection.setAutoCommit(true);
+
+            System.out.println("Deleted " + result.length + " products.");
+        } catch (SQLException sqlException) {
+            dbConnection.rollback();
+            dbConnection.setAutoCommit(true);
+            throw sqlException;
         }
-
-        int[] result = statement.executeBatch();
-        dbConnection.commit();
-        dbConnection.setAutoCommit(true);
-
-        System.out.println("Deleted " + result.length + " products.");
     }
+
 
     public boolean insertSale(SalesClass sale) throws SQLException {
         dbConnection.setAutoCommit(false);
-        PreparedStatement insertSaleStatement = dbConnection
+        try (PreparedStatement insertSaleStatement = dbConnection
                 .prepareStatement("INSERT INTO sales (sale_id, customerId, paymentMethod, total) VALUES (?, ?, ?, ?)");
+             PreparedStatement insertProductStatement = dbConnection
+                     .prepareStatement("INSERT INTO sales_products (sale_id, product_id) VALUES (?, ?)");
+             PreparedStatement getHighestSaleId = dbConnection
+                     .prepareStatement("SELECT max(sale_id) FROM sales;")) {
 
-        PreparedStatement insertProductStatement = dbConnection
-                .prepareStatement("INSERT INTO sales_products (sale_id, product_id) VALUES (?, ?)");
+            int highestSaleId;
+            try (ResultSet rs = getHighestSaleId.executeQuery()) {
+                highestSaleId = rs.getInt(1);
+            }
+            int saleId = highestSaleId + 1;
 
-        PreparedStatement getHighestSaleId = dbConnection
-                .prepareStatement("SELECT max(sale_id) FROM sales;");
+            insertSaleStatement.setInt(1, saleId);
+            insertSaleStatement.setInt(2, sale.getCustomerID());
+            insertSaleStatement.setString(3, sale.getPaymentMethod());
+            insertSaleStatement.setDouble(4, sale.getTotal());
 
-        int highestSaleId = getHighestSaleId.executeQuery().getInt(1);
-        int saleId = highestSaleId + 1;
+            int rowCount = insertSaleStatement.executeUpdate();
 
-        insertSaleStatement.setInt(1, saleId);
-        insertSaleStatement.setInt(2, sale.getCustomerID());
-        insertSaleStatement.setString(3, sale.getPaymentMethod());
-        insertSaleStatement.setDouble(4, sale.getTotal());
+            if (rowCount != 1) {
+                log.warn("Error with database operation");
+                dbConnection.rollback();
+                dbConnection.setAutoCommit(true);
+                return false;
+            }
 
-        int rowCount = insertSaleStatement.executeUpdate();
+            insertProductStatement.setInt(1, saleId);
 
-        if (rowCount != 1) {
-            log.warn("Error with database operation");
+            for (Product productBought : sale.getProductsBought()) {
+                UUID productUUID = productBought.getUuid();
+                insertProductStatement.setString(2, productUUID.toString());
+                insertProductStatement.addBatch();
+            }
+            insertProductStatement.executeBatch();
+
+            dbConnection.commit();
+            dbConnection.setAutoCommit(true);
+            return true;
+        } catch (SQLException sqlException) {
             dbConnection.rollback();
             dbConnection.setAutoCommit(true);
-            return false;
+            throw sqlException;
         }
-
-        insertProductStatement.setInt(1, saleId);
-
-        for (Product productBought : sale.getProductsBought()) {
-            UUID productUUID = productBought.getUuid();
-            insertProductStatement.setString(2, productUUID.toString());
-            insertProductStatement.addBatch();
-        }
-        insertProductStatement.executeBatch();
-
-        dbConnection.commit();
-        dbConnection.setAutoCommit(true);
-        return true;
     }
+
 
     public List<SalesClass> getAllSales() throws SQLException {
         List<SalesClass> sales = new ArrayList<>();
 
-        PreparedStatement selectSalesStatement = dbConnection
-                .prepareStatement("SELECT sale_id, customerId, paymentMethod, total FROM sales;");
+        try (PreparedStatement selectSalesStatement = dbConnection
+                .prepareStatement("SELECT sale_id, customerId, paymentMethod, total FROM sales;")) {
 
-        ResultSet rs = selectSalesStatement.executeQuery();
-        while (rs.next()) {
-            int saleId = rs.getInt("sale_id");
-            int customerId = rs.getInt("customerId");
-            String paymentMethod = rs.getString("paymentMethod");
-            double total = rs.getDouble("total");
+            try (ResultSet rs = selectSalesStatement.executeQuery()) {
+                while (rs.next()) {
+                    int saleId = rs.getInt("sale_id");
+                    int customerId = rs.getInt("customerId");
+                    String paymentMethod = rs.getString("paymentMethod");
+                    double total = rs.getDouble("total");
 
-            List<Product> products = getProductsFromSale(saleId);
+                    List<Product> products = getProductsFromSale(saleId);
 
-            sales.add(new SalesClass(saleId, customerId, paymentMethod, products, total));
+                    sales.add(new SalesClass(saleId, customerId, paymentMethod, products, total));
+                }
+            }
         }
 
         return sales;
@@ -357,26 +375,28 @@ public class DatabaseOperations {
     private List<Product> getProductsFromSale(int saleId) throws SQLException {
         List<Product> products = new ArrayList<>();
 
-        PreparedStatement statement = dbConnection
-                .prepareStatement("SELECT product_id FROM sales_products WHERE sale_id = ?;");
+        try (PreparedStatement statement = dbConnection
+                .prepareStatement("SELECT product_id FROM sales_products WHERE sale_id = ?;")) {
 
-        statement.setInt(1, saleId);
+            statement.setInt(1, saleId);
 
-        ResultSet resultSet = statement.executeQuery();
-        while (resultSet.next()) {
-            String productUUID = resultSet.getString("product_id");
-            Product product = getProductByUUID(UUID.fromString(productUUID));
-            if (product != null) {
-                products.add(product);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    String productUUID = resultSet.getString("product_id");
+                    Product product = getProductByUUID(UUID.fromString(productUUID));
+                    if (product != null) {
+                        products.add(product);
+                    }
+                }
             }
         }
 
         return products;
     }
-
     public void nukeAllProducts() throws SQLException {
-        Statement nukeStatement = dbConnection.createStatement();
-        nukeStatement.execute("DELETE FROM products;");
+        try (Statement nukeStatement = dbConnection.createStatement()) {
+            nukeStatement.execute("DELETE FROM products;");
+        }
     }
 
     public void close() throws SQLException {
