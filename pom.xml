@@ -6,7 +6,7 @@
 
     <groupId>com.prg-2025-ta.project</groupId>
     <artifactId>examination-pgr-2025-TA</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <name>examination-pgr-2025-TA</name>
 
     <properties>
