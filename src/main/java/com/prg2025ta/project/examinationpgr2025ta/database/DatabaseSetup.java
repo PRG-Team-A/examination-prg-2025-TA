@@ -3,22 +3,27 @@ package com.prg2025ta.project.examinationpgr2025ta.database;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 public class DatabaseSetup {
-
+    // CHANGED: Enhanced products table to support ALL product types:
+    // - GroceryProduct: needs_cooling, expiry_date
+    // - NonGroceryProduct: tax_category, is_premium
+    // - ElectronicProduct: warranty_years (extends NonGroceryProduct)
+    // - WeightBasedProduct: price_per_kg (no regular price)
+    // PR #34 compatible: Includes warehouse, sales, sales_products tables
     private static final String[] sql_to_execute = new String[] {
             "CREATE TABLE IF NOT EXISTS \"products\"\n" +
                     "(\n" +
-                    "    product_uuid  TEXT\n" +
-                    "        primary key,\n" +
-                    "    display_name  TEXT not null,\n" +
-                    "    price         NUMBER,\n" +
-                    "    product_type  TEXT DEFAULT 'grocery',\n" +
-                    "    needs_cooling INTEGER,\n" +
-                    "    expiry_date   INTEGER,\n" +
-                    "    tax_category  TEXT DEFAULT 'STANDARD',\n" +
-                    "    is_premium    INTEGER DEFAULT 0\n" +
+                    "    product_uuid    TEXT PRIMARY KEY,\n" +
+                    "    product_type    TEXT DEFAULT 'grocery',\n" +
+                    "    display_name    TEXT NOT NULL,\n" +
+                    "    price           NUMBER,\n" +
+                    "    price_per_kg    NUMBER,\n" +
+                    "    needs_cooling   INTEGER DEFAULT 0,\n" +
+                    "    expiry_date     INTEGER DEFAULT 0,\n" +
+                    "    tax_category    TEXT DEFAULT 'STANDARD',\n" +
+                    "    is_premium      INTEGER DEFAULT 0,\n" +
+                    "    warranty_years  INTEGER DEFAULT 0\n" +
                     ");",
             "CREATE TABLE IF NOT EXISTS warehouse\n" +
                     "(\n" +
@@ -46,11 +51,9 @@ public class DatabaseSetup {
     }
 
     public static void setup(Connection connection) throws SQLException {
-
         for (String sql : sql_to_execute) {
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.execute();
         }
-
     }
 }

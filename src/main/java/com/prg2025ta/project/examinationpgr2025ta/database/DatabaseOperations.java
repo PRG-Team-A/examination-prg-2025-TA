@@ -1,8 +1,7 @@
 package com.prg2025ta.project.examinationpgr2025ta.database;
 
 import com.prg2025ta.project.examinationpgr2025ta.SalesClass;
-import com.prg2025ta.project.examinationpgr2025ta.products.GroceryProduct;
-import com.prg2025ta.project.examinationpgr2025ta.products.Product;
+import com.prg2025ta.project.examinationpgr2025ta.products.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -37,86 +36,279 @@ public class DatabaseOperations {
         insertMultipleProducts(products);
     }
 
+
     public void insertMultipleProducts(List<Product> products) throws SQLException {
         dbConnection.setAutoCommit(false);
-        try (PreparedStatement prepared = dbConnection.prepareStatement("INSERT INTO products (product_uuid, display_name, price) VALUES (?, ?, ?);")) {
+        try (PreparedStatement prepared = dbConnection.prepareStatement(
+                "INSERT INTO products (product_uuid, product_type, display_name, price, price_per_kg, needs_cooling, expiry_date, tax_category, is_premium, warranty_years) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")) {
             for (Product product : products) {
                 prepared.setString(1, product.getUuid().toString());
                 prepared.setString(2, product.getDisplayName());
                 prepared.setDouble(3, product.getPrice());
+
+                if (product instanceof GroceryProduct) {
+                    // GroceryProduct: needs_cooling, expiry_date
+                    GroceryProduct gp = (GroceryProduct) product;
+                    prepared.setString(2, "grocery");
+                    prepared.setString(3, gp.getDisplayName());
+                    prepared.setDouble(4, gp.getPrice());
+                    prepared.setNull(5, Types.NUMERIC);
+                    prepared.setInt(6, gp.needsToBeCooled() ? 2 : 1);
+                    prepared.setLong(7, gp.getDateOfExpiry().atStartOfDay(ZoneId.of("UTC")).toEpochSecond());
+                    prepared.setString(8, "STANDARD");
+                    prepared.setInt(9, 0);
+                    prepared.setInt(10, 0);
+
+                } else if (product instanceof ElectronicProduct) {
+                    // ElectronicProduct extends NonGroceryProduct: tax_category, is_premium, warranty_years
+                    ElectronicProduct ep = (ElectronicProduct) product;
+                    prepared.setString(2, "electronic");
+                    prepared.setString(3, ep.getDisplayName());
+                    prepared.setDouble(4, ep.getPrice());
+                    prepared.setNull(5, Types.NUMERIC);
+                    prepared.setInt(6, 0);
+                    prepared.setLong(7, 0);
+                    prepared.setString(8, ep.getTaxCategory() != null ? ep.getTaxCategory().name() : "STANDARD");
+                    prepared.setInt(9, ep.isPremium() ? 1 : 0);
+                    prepared.setInt(10, ep.getWarrantyYears());
+
+                } else if (product instanceof NonGroceryProduct) {
+                    // NonGroceryProduct (not Electronic): tax_category, is_premium
+                    NonGroceryProduct ngp = (NonGroceryProduct) product;
+                    prepared.setString(2, "non_grocery");
+                    prepared.setString(3, ngp.getDisplayName());
+                    prepared.setDouble(4, ngp.getPrice());
+                    prepared.setNull(5, Types.NUMERIC);
+                    prepared.setInt(6, 0);
+                    prepared.setLong(7, 0);
+                    prepared.setString(8, ngp.getTaxCategory() != null ? ngp.getTaxCategory().name() : "STANDARD");
+                    prepared.setInt(9, ngp.isPremium() ? 1 : 0);
+                    prepared.setInt(10, 0);
+
+                } else if (product instanceof WeightBasedProduct) {
+                    // WeightBasedProduct: price_per_kg (no regular price)
+                    WeightBasedProduct wbp = (WeightBasedProduct) product;
+                    prepared.setString(2, "weight_based");
+                    prepared.setString(3, wbp.getDisplayName());
+                    prepared.setNull(4, Types.NUMERIC);
+                    prepared.setDouble(5, wbp.getPricePerKg());
+                    prepared.setInt(6, 0);
+                    prepared.setLong(7, 0);
+                    prepared.setString(8, "STANDARD");
+                    prepared.setInt(9, 0);
+                    prepared.setInt(10, 0);
+
+                } else {
+                    // Unknown product type - treat as basic product
+                    prepared.setString(2, "unknown");
+                    prepared.setString(3, product.getDisplayName());
+                    prepared.setDouble(4, product.getPrice());
+                    prepared.setNull(5, Types.NUMERIC);
+                    prepared.setInt(6, 0);
+                    prepared.setLong(7, 0);
+                    prepared.setString(8, "STANDARD");
+                    prepared.setInt(9, 0);
+                    prepared.setInt(10, 0);
+                }
+
                 prepared.addBatch();
             }
 
             int[] results = prepared.executeBatch();
             dbConnection.commit();
+            dbConnection.setAutoCommit(true);
 
             System.out.println("Inserted " + results.length + " products.");
+        } catch (SQLException sqlException) {
+            dbConnection.rollback();
+            dbConnection.setAutoCommit(true);
+            throw sqlException;
         }
     }
 
-    // TODO: Add tests
     public Product getProductByUUID(UUID uuid) throws SQLException {
         PreparedStatement statement = dbConnection
-                .prepareStatement("SELECT product_uuid, display_name, price, needs_cooling, expiry_date FROM products WHERE product_uuid = ?");
+                .prepareStatement("SELECT product_uuid, product_type, display_name, price, price_per_kg, needs_cooling, expiry_date, tax_category, is_premium, warranty_years FROM products WHERE product_uuid = ?");
 
         statement.setString(1, uuid.toString());
         ResultSet resultSet = statement.executeQuery();
 
-        boolean resultSetIsEmpty = !resultSet.next();
-
-        if (!resultSetIsEmpty) {
+        if (!resultSet.next()) {
             return null;
         }
 
         String product_id = resultSet.getString("product_uuid");
+        String product_type = resultSet.getString("product_type");
         String display_name = resultSet.getString("display_name");
         double price = resultSet.getDouble("price");
+        double price_per_kg = resultSet.getDouble("price_per_kg");
         int needsCooling = resultSet.getInt("needs_cooling");
-        long expiry_date = resultSet.getInt("expiry_date");
+        long expiry_date = resultSet.getLong("expiry_date");
+        String tax_category = resultSet.getString("tax_category");
+        int is_premium = resultSet.getInt("is_premium");
+        int warranty_years = resultSet.getInt("warranty_years");
 
-        if (product_id == null) return null;
-
-        if (display_name != null && price != 0 && needsCooling != 0 && expiry_date != 0) {
-            LocalDate dateOfExpiry = LocalDate.ofInstant(Instant.ofEpochSecond(expiry_date), ZoneId.of("UTC"));
-            boolean doesProductNeedCooling = needsCooling == 2;
-            return new GroceryProduct(
-                    display_name,
-                    price,
-                    dateOfExpiry,
-                    doesProductNeedCooling,
-                    UUID.fromString(product_id)
-            );
+        if (product_id == null || display_name == null) {
+            return null;
         }
 
-        return null;
+        try {
+            switch (product_type) {
+                case "grocery":
+                    LocalDate dateOfExpiry = expiry_date > 0
+                            ? LocalDate.ofInstant(Instant.ofEpochSecond(expiry_date), ZoneId.of("UTC"))
+                            : GroceryProduct.defaultDateOfExpiry;
+                    boolean doesProductNeedCooling = needsCooling == 2;
+                    return new GroceryProduct(
+                            display_name,
+                            price,
+                            dateOfExpiry,
+                            doesProductNeedCooling,
+                            UUID.fromString(product_id)
+                    );
+
+                case "electronic":
+                    TaxCategory elecTaxCat = TaxCategory.valueOf(tax_category != null ? tax_category : "STANDARD");
+                    boolean elecIsPremium = is_premium == 1;
+                    return new ElectronicProduct(
+                            display_name,
+                            price,
+                            elecTaxCat,
+                            elecIsPremium,
+                            warranty_years,
+                            UUID.fromString(product_id)
+                    );
+
+                case "non_grocery":
+                    TaxCategory ngpTaxCat = TaxCategory.valueOf(tax_category != null ? tax_category : "STANDARD");
+                    boolean ngpIsPremium = is_premium == 1;
+                    return new NonGroceryProduct(
+                            display_name,
+                            price,
+                            ngpTaxCat,
+                            ngpIsPremium,
+                            UUID.fromString(product_id)
+                    );
+
+                case "weight_based":
+                    return new WeightBasedProduct(
+                            display_name,
+                            price_per_kg,
+                            UUID.fromString(product_id)
+                    );
+
+                default:
+                    log.warn("Unknown product type: " + product_type);
+                    return null;
+            }
+        } catch (IllegalArgumentException e) {
+            log.error("Error deserializing product with UUID: " + product_id, e);
+            return null;
+        }
     }
 
     public List<Product> getAllProducts() throws SQLException {
         List<Product> products = new ArrayList<>();
 
         Statement statement = dbConnection.createStatement();
-        statement.execute("SELECT product_uuid, display_name, price FROM main.products;");
+        statement.execute("SELECT product_uuid, product_type, display_name, price, price_per_kg, needs_cooling, expiry_date, tax_category, is_premium, warranty_years FROM products;");
 
         ResultSet resultSet = statement.getResultSet();
 
-        if (!resultSet.next()) {
-            return products;
-        }
-
-        do {
+        while (resultSet.next()) {
             String uuid = resultSet.getString("product_uuid");
+            String product_type = resultSet.getString("product_type");
             String display_name = resultSet.getString("display_name");
             double price = resultSet.getDouble("price");
+            double price_per_kg = resultSet.getDouble("price_per_kg");
+            int needsCooling = resultSet.getInt("needs_cooling");
+            long expiry_date = resultSet.getLong("expiry_date");
+            String tax_category = resultSet.getString("tax_category");
+            int is_premium = resultSet.getInt("is_premium");
+            int warranty_years = resultSet.getInt("warranty_years");
 
-            products.add(new GroceryProduct(
-                    display_name,
-                    price,
-                    GroceryProduct.defaultDateOfExpiry,
-                    GroceryProduct.defaultNeedsCooling,
-                    UUID.fromString(uuid)
-            ));
+            if (uuid == null || display_name == null) {
+                continue;
+            }
 
-        } while (resultSet.next());
+            Product product = null;
+
+            try {
+                // Infer product type and deserialize accordingly
+                switch (product_type) {
+                    case "grocery":
+                        LocalDate dateOfExpiry = expiry_date > 0
+                                ? LocalDate.ofInstant(Instant.ofEpochSecond(expiry_date), ZoneId.of("UTC"))
+                                : GroceryProduct.defaultDateOfExpiry;
+                        boolean doesProductNeedCooling = needsCooling == 2;
+                        product = new GroceryProduct(
+                                display_name,
+                                price,
+                                dateOfExpiry,
+                                doesProductNeedCooling,
+                                UUID.fromString(uuid)
+                        );
+                        break;
+
+                    case "electronic":
+                        TaxCategory elecTaxCat = TaxCategory.valueOf(tax_category != null ? tax_category : "STANDARD");
+                        boolean elecIsPremium = is_premium == 1;
+                        product = new ElectronicProduct(
+                                display_name,
+                                price,
+                                elecTaxCat,
+                                elecIsPremium,
+                                warranty_years,
+                                UUID.fromString(uuid)
+                        );
+                        break;
+
+                    case "non_grocery":
+                        TaxCategory ngpTaxCat = TaxCategory.valueOf(tax_category != null ? tax_category : "STANDARD");
+                        boolean ngpIsPremium = is_premium == 1;
+                        product = new NonGroceryProduct(
+                                display_name,
+                                price,
+                                ngpTaxCat,
+                                ngpIsPremium,
+                                UUID.fromString(uuid)
+                        );
+                        break;
+
+                    case "weight_based":
+                        product = new WeightBasedProduct(
+                                display_name,
+                                price_per_kg,
+                                UUID.fromString(uuid)
+                        );
+                        break;
+
+                    default:
+                        // Fallback: try to infer from columns
+                        if (needsCooling != 0 || expiry_date != 0) {
+                            LocalDate fallbackDateOfExpiry = expiry_date > 0
+                                    ? LocalDate.ofInstant(Instant.ofEpochSecond(expiry_date), ZoneId.of("UTC"))
+                                    : GroceryProduct.defaultDateOfExpiry;
+                            boolean fallbackNeedsCooling = needsCooling == 2;
+                            product = new GroceryProduct(
+                                    display_name,
+                                    price,
+                                    fallbackDateOfExpiry,
+                                    fallbackNeedsCooling,
+                                    UUID.fromString(uuid)
+                            );
+                        }
+                }
+            } catch (IllegalArgumentException e) {
+                log.error("Error deserializing product with UUID: " + uuid, e);
+                continue;
+            }
+
+            if (product != null) {
+                products.add(product);
+            }
+        }
 
         return products;
     }
@@ -134,6 +326,7 @@ public class DatabaseOperations {
 
         int[] result = statement.executeBatch();
         dbConnection.commit();
+        dbConnection.setAutoCommit(true);
 
         System.out.println("Deleted " + result.length + " products.");
     }
@@ -167,6 +360,7 @@ public class DatabaseOperations {
         if (rowCount != 1) {
             log.warn("Error with database operation");
             dbConnection.rollback();
+            dbConnection.setAutoCommit(true);
             return false;
         }
 
@@ -205,6 +399,7 @@ public class DatabaseOperations {
         return sales;
     }
 
+    // CHANGED: Added null check to prevent adding null products
     private List<Product> getProductsFromSale(int saleId) throws SQLException {
         List<Product> products = new ArrayList<>();
 
@@ -217,7 +412,9 @@ public class DatabaseOperations {
         while (resultSet.next()) {
             String productUUID = resultSet.getString("product_id");
             Product product = getProductByUUID(UUID.fromString(productUUID));
-            products.add(product);
+            if (product != null) {
+                products.add(product);
+            }
         }
 
         return products;
