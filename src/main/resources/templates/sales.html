@@ -25,7 +25,7 @@
         <td th:text="${sale.getCustomerID()}">CUSTOMER_ID</td>
         <td th:text="${sale.getProductsBought().size()}">PRODUCTS_BOUGHT</td>
         <td th:text="${sale.getPaymentMethod()}">PAYMENT_METHOD</td>
-        <td th:text="${sale.getTotal()}">TOTAL</td>
+        <td th:text="${sale.getTotal()} + ' €'">TOTAL</td>
     </tr>
     </tbody>
 </table>

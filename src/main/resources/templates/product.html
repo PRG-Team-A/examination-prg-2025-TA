@@ -58,7 +58,7 @@
             <tbody>
             <tr th:each="product: ${products}">
                 <td th:text="${product.getDisplayName()}">DISPLAY_NAME</td>
-                <td th:text="'€' + ${product.getPrice()}">PRICE</td>
+                <td th:text="${product.getPrice()} + ' €'">PRICE</td>
             </tr>
             </tbody>
         </table>
