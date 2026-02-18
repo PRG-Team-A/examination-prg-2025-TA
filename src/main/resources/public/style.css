@@ -12,7 +12,7 @@ body {
 }
 
 header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #2A7B9B 0%, #57C785 50%, #EDDD53 100%);
     color: white;
     padding: 1rem 2rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -46,7 +46,7 @@ h2 {
     margin-top: 2rem;
     margin-bottom: 1rem;
     font-size: 1.75rem;
-    border-bottom: 3px solid #667eea;
+    border-bottom: 3px solid #2A7B9B 0%;
     padding-bottom: 0.5rem;
 }
 
@@ -56,13 +56,13 @@ p, span {
 }
 
 a {
-    color: #667eea;
+    color: #49AF8C;
     text-decoration: none;
     transition: color 0.3s ease;
 }
 
 a:hover {
-    color: #764ba2;
+    color: #49AF8C;
     text-decoration: underline;
 }
 
@@ -103,14 +103,14 @@ input[type="text"]:focus,
 input[type="number"]:focus,
 select:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #49AF8C;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 /* Buttons */
 button,
 input[type="submit"] {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #2A7B9B 0%, #57C785 50%, #EDDD53 100%);
     color: white;
     border: none;
     padding: 0.75rem 1.5rem;
@@ -159,7 +159,7 @@ table {
 }
 
 thead {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #2A7B9B 0%, #57C785 50%, #EDDD53 100%);
     color: white;
 }
 
@@ -194,7 +194,7 @@ tbody tr:last-child {
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     margin-bottom: 2rem;
-    border-left: 4px solid #667eea;
+    border-left: 4px solid #49AF8C;
 }
 
 .error-message {
@@ -220,7 +220,7 @@ tbody tr:last-child {
 .total {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #667eea;
+    color: #49AF8C;
     background: white;
     padding: 1rem;
     border-radius: 4px;
