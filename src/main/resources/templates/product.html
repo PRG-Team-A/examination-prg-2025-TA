@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Product Creation</title>
+    <meta charset="UTF-8"
+    content="width=device-width, initial-scale=1.0">
+    <title>Product Management</title>
     <link rel="stylesheet" href="/style.css">
 
     <script>
@@ -21,41 +22,51 @@
     </script>
 </head>
 <body>
-<a href="/sales">Sales page</a>
-<h1>Product page</h1>
-<p>If you are not an employee, please don't do anything and just go to our <a href="/cart">page for customers</a></p>
-<div>
-    <h2>New Product</h2>
-    <form action="#" th:action="@{/product/new}" th:object="${Product}" method="post">
-        <label for="displayNameInput">Display Name:</label>
-        <input id="displayNameInput" type="text" name="displayName">
+<header>
+    <a href="/cart">← If you aren't an employee, please go back to the customer page</a>
+</header>
 
-        <label for="priceInput">Price:</label>
-        <input type="number" name="price" id="priceInput" step=".01">
+<div class="container">
+    <h1>Products</h1>
 
-        <input type="submit" value="Create">
-    </form>
-</div>
-<h2>Products in Warehouse</h2>
-<div>
-    <table>
-        <thead>
-        <tr>
-            <td>Display name</td>
-            <td>Price</td>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="product: ${products}">
-            <td th:text="${product.getDisplayName()}">DISPLAY_NAME</td>
-            <td th:text="${product.getPrice()}">PRICE</td>
-            <td><button th:data-id="${product.getProductUUID()}" th:onclick="|removeProduct(this.getAttribute('data-id'))|">Remove Product</button></td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-<div>
-    <button onclick="saveProducts()">Save to warehouse</button>
+    <div class="info-box">
+        <p>Product Warehouse Inventory.</p>
+    </div>
+
+    <div>
+        <h2>Add New Product</h2>
+        <form action="#" th:action="@{/product}" th:object="${Product}" method="post">
+            <label for="displayNameInput">Product Name:</label>
+            <input id="displayNameInput" type="text" name="displayName" required placeholder="Enter product name">
+
+            <label for="priceInput">Price (€):</label>
+            <input type="number" name="price" id="priceInput" step=".01">
+
+            <input type="submit" value="Add Product">
+        </form>
+    </div>
+
+    <div>
+        <h2>Products in Warehouse.</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Price</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="product: ${products}">
+                <td th:text="${product.getDisplayName()}">DISPLAY_NAME</td>
+                <td th:text="${product.getPrice()} + ' €'">PRICE</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div>
+        <button onclick="saveProducts()">Save to Warehouse</button>
+    </div>
 </div>
 </body>
 </html>
