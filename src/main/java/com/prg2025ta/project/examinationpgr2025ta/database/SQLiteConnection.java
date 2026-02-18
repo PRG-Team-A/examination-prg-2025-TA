@@ -2,6 +2,12 @@ package com.prg2025ta.project.examinationpgr2025ta.database;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFileAttributes;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -16,10 +22,27 @@ public class SQLiteConnection implements AutoCloseable {
     public Connection getConnection() { return this.connection; }
 
     public synchronized static Connection getInstance() throws SQLException {
+        File dbFilePath = Path.of(dbURL.substring("jdbc:sqlite:".length())).toFile();
+        boolean createNew = false;
+
+        if (!dbFilePath.exists()) {
+            try {
+                dbFilePath.createNewFile();
+                createNew = true;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         if (INSTANCE == null || INSTANCE.getConnection().isClosed()) {
             INSTANCE = new SQLiteConnection();
             INSTANCE.init();
         }
+
+        if (createNew) {
+            DatabaseSetup.setup(INSTANCE.getConnection());
+        }
+
         return INSTANCE.getConnection();
     }
 
