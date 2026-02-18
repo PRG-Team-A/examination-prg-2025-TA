@@ -44,16 +44,12 @@ public class DatabaseOperations {
             for (Product product : products) {
                 prepared.setString(1, product.getUuid().toString());
 
-                if (product instanceof GroceryProduct gp) {
-                    insertGroceryProduct(prepared, gp);
-                } else if (product instanceof ElectronicProduct ep) {
-                    insertElectronicProduct(prepared, ep);
-                } else if (product instanceof NonGroceryProduct ngp) {
-                    insertNonGroceryProduct(prepared, ngp);
-                } else if (product instanceof WeightBasedProduct wbp) {
-                    insertWeightBasedProduct(prepared, wbp);
-                } else {
-                    insertUnknownProduct(prepared, product);
+                switch (product) {
+                    case GroceryProduct gp -> insertGroceryProduct(prepared, gp);
+                    case ElectronicProduct ep -> insertElectronicProduct(prepared, ep);
+                    case NonGroceryProduct ngp -> insertNonGroceryProduct(prepared, ngp);
+                    case WeightBasedProduct wbp -> insertWeightBasedProduct(prepared, wbp);
+                    default -> insertUnknownProduct(prepared, product);
                 }
 
                 prepared.addBatch();
@@ -91,7 +87,7 @@ public class DatabaseOperations {
         prepared.setInt(6, 0);
         prepared.setLong(7, 0);
         prepared.setString(8, ep.getTaxCategory() != null ? ep.getTaxCategory().name() : "STANDARD");
-        prepared.setInt(9, ep.isPremium() ? 1 : 0);
+        prepared.setInt(9, ep.isPremium() ? 1 : 0); //needs_cooling stores 2 and 1, consider storing 2 for true and 1 for false here. Should I?
         prepared.setInt(10, ep.getWarrantyYears());
     }
 
